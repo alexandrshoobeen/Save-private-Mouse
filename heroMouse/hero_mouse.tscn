@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cg857j4qclu32"]
 
-[ext_resource type="Script" path="res://heroMouse/hero_mouse.gd" id="1_5i1f4"]
-[ext_resource type="Texture2D" uid="uid://vuolciq6jsa6" path="res://assets/icon.svg" id="1_wx3x3"]
+[ext_resource type="Script" uid="uid://bdjaxccn7hw6m" path="res://heroMouse/hero_mouse.gd" id="1_5i1f4"]
+[ext_resource type="Texture2D" uid="uid://c31jqjlf380p0" path="res://assets/one_tile.png" id="2_mbcqr"]
 
 [node name="HeroMouse" type="Node2D"]
 position = Vector2(222, 561)
@@ -9,4 +9,4 @@ script = ExtResource("1_5i1f4")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(1, 2)
-texture = ExtResource("1_wx3x3")
+texture = ExtResource("2_mbcqr")
