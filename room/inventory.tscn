@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://be71e7in0blky"]
 
-[ext_resource type="Script" uid="uid://du4xia5y6qsia" path="res://gui.gd" id="1_hin5q"]
+[ext_resource type="Script" uid="uid://du4xia5y6qsia" path="res://room/gui.gd" id="1_hin5q"]
 
 [node name="Scene" type="Node2D"]
 
@@ -8,7 +8,6 @@
 script = ExtResource("1_hin5q")
 
 [node name="Panel" type="Panel" parent="GUI"]
-visible = false
 offset_left = 21.0
 offset_top = 31.0
 offset_right = 262.0
