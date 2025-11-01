@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8yrsf2vf7sb0"
-path="res://.godot/imported/one_tile.png-96920078bf6eee3ceabd87117357aba9.ctex"
+uid="uid://ifgt3vx4681"
+path="res://.godot/imported/sword.jpg-537792b1e1c4ad6af8c52ddaea800c1b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://one_tile.png"
-dest_files=["res://.godot/imported/one_tile.png-96920078bf6eee3ceabd87117357aba9.ctex"]
+source_file="res://assets/sword.jpg"
+dest_files=["res://.godot/imported/sword.jpg-537792b1e1c4ad6af8c52ddaea800c1b.ctex"]
 
 [params]
 

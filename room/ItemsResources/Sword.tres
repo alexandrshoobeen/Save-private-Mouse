@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://cb0ccguuajuu4"]
+
+[ext_resource type="Script" uid="uid://dp68rqgr7l423" path="res://room/ItemsResources/ItemData.gd" id="1_e0xfg"]
+[ext_resource type="Texture2D" uid="uid://clkbwad67isn1" path="res://assets/tilemap2 copy.png" id="2_vem2j"]
+
+[resource]
+script = ExtResource("1_e0xfg")
+type = 4
+name = "Sword"
+description = "This is powerful sword"
+texture = ExtResource("2_vem2j")

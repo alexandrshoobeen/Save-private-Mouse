@@ -10,7 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Save private Mouse"
+config/name="little_mouse"
+run/main_scene="uid://be71e7in0blky"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 

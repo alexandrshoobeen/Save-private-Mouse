@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://be71e7in0blky"]
+
+[ext_resource type="Script" uid="uid://du4xia5y6qsia" path="res://gui.gd" id="1_hin5q"]
+
+[node name="Scene" type="Node2D"]
+
+[node name="GUI" type="CanvasLayer" parent="."]
+script = ExtResource("1_hin5q")
+
+[node name="Panel" type="Panel" parent="GUI"]
+visible = false
+offset_left = 21.0
+offset_top = 31.0
+offset_right = 262.0
+offset_bottom = 228.0
+
+[node name="Inv" type="GridContainer" parent="GUI"]
+unique_name_in_owner = true
+offset_left = 20.0
+offset_top = 39.0
+offset_right = 263.0
+offset_bottom = 227.0
+columns = 4

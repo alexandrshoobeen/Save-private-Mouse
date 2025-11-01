@@ -1,0 +1,90 @@
+[gd_scene load_steps=7 format=4 uid="uid://bgak4262np3m3"]
+
+[ext_resource type="Texture2D" uid="uid://bjgmgr4omgxur" path="res://assets/iso_tileset.png" id="1_v0nwp"]
+[ext_resource type="Script" uid="uid://k18g2bokbfn4" path="res://room/build_system.gd" id="2_b07f3"]
+[ext_resource type="PackedScene" uid="uid://4eki364smjfx" path="res://room/building.tscn" id="3_6kngx"]
+[ext_resource type="PackedScene" uid="uid://be71e7in0blky" path="res://room/inventory.tscn" id="4_abt81"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6ecdo"]
+texture = ExtResource("1_v0nwp")
+texture_region_size = Vector2i(32, 32)
+1:0/0 = 0
+1:0/0/texture_origin = Vector2i(0, -8)
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, -8)
+3:0/0 = 0
+3:0/0/texture_origin = Vector2i(0, -8)
+4:0/0 = 0
+4:0/0/texture_origin = Vector2i(0, -8)
+5:0/0 = 0
+5:0/0/texture_origin = Vector2i(0, -8)
+6:0/0 = 0
+6:0/0/texture_origin = Vector2i(0, -8)
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+10:0/0 = 0
+11:0/0 = 0
+12:0/0 = 0
+13:0/0 = 0
+0:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+8:1/0 = 0
+9:1/0 = 0
+10:1/0 = 0
+11:1/0 = 0
+12:1/0 = 0
+13:1/0 = 0
+1:1/0 = 0
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, -8)
+
+[sub_resource type="TileSet" id="TileSet_ph8b8"]
+tile_shape = 1
+tile_layout = 5
+tile_offset_axis = 1
+tile_size = Vector2i(32, 16)
+sources/0 = SubResource("TileSetAtlasSource_6ecdo")
+
+[node name="blocks" type="Node2D"]
+y_sort_enabled = true
+
+[node name="TileMapLayer2" type="TileMapLayer" parent="."]
+z_index = 1
+y_sort_enabled = true
+tile_map_data = PackedByteArray("AAAiAAMAAAABAAAAAAAiAAQAAAABAAAAAAAjAAMAAAABAAAAAAAjAAQAAAABAAAAAAAkAAQAAAABAAAAAAAlAAQAAAABAAAAAAAiAAUAAAABAAAAAAAkAAMAAAABAAAAAAAkAAUAAAABAAAAAAAlAAMAAAABAAAAAAAlAAUAAAABAAAAAAAmAAUAAAABAAAAAAAnAAUAAAABAAAAAAAoAAUAAAABAAAAAAApAAUAAAABAAAAAAAqAAUAAAAFAAAAAAArAAUAAAAFAAAAAAAsAAUAAAAGAAAAAAAjAAUAAAABAAAAAAAtAAUAAAABAAAAAAAuAAUAAAABAAAAAAAsAAgAAAABAAAAAAAtAAgAAAABAAAAAAA=")
+tile_set = SubResource("TileSet_ph8b8")
+y_sort_origin = 1
+
+[node name="TileMapLayer3" type="TileMapLayer" parent="."]
+visible = false
+z_index = 1
+y_sort_enabled = true
+tile_map_data = PackedByteArray("AAAiAAMAAAABAAAAAAAiAAQAAAABAAAAAAAjAAMAAAABAAAAAAAjAAQAAAABAAAAAAAkAAQAAAABAAAAAAAlAAQAAAABAAAAAAAiAAUAAAABAAAAAAAkAAMAAAABAAAAAAAkAAUAAAABAAAAAAAlAAMAAAABAAAAAAAlAAUAAAABAAAAAAAmAAUAAAABAAAAAAAnAAUAAAABAAAAAAAoAAUAAAABAAAAAAApAAUAAAABAAAAAAAqAAUAAAAFAAAAAAArAAUAAAAFAAAAAAAsAAUAAAAGAAAAAAAjAAUAAAABAAAAAAA=")
+tile_set = SubResource("TileSet_ph8b8")
+y_sort_origin = 1
+
+[node name="Node2D" type="Node2D" parent="."]
+visible = false
+y_sort_enabled = true
+
+[node name="TileMapLayer3" type="TileMapLayer" parent="Node2D"]
+visible = false
+z_index = 2
+y_sort_enabled = true
+tile_map_data = PackedByteArray("AAAEAP//AAAAAAAAAAADAP//AAAAAAAAAAACAP//AAAAAAAAAAABAP//AAAAAAAAAAAEAP7/AAAAAAAAAAAEAP3/AAAAAAAAAAADAP3/AAAAAAAAAAADAP7/AAAAAAAAAAACAP3/AAAAAAAAAAACAP7/AAAAAAAAAAABAP7/AAAAAAAAAAABAP3/AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_ph8b8")
+y_sort_origin = 2
+
+[node name="BuildSystem" type="Node2D" parent="." node_paths=PackedStringArray("tilemap_layer")]
+script = ExtResource("2_b07f3")
+tilemap_layer = NodePath("../TileMapLayer2")
+object_scene = ExtResource("3_6kngx")
+
+[node name="Scene" parent="." instance=ExtResource("4_abt81")]
+position = Vector2(521, 644)
