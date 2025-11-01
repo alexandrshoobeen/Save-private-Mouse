@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=4 uid="uid://bgak4262np3m3"]
 
 [ext_resource type="Texture2D" uid="uid://bjgmgr4omgxur" path="res://assets/iso_tileset.png" id="1_v0nwp"]
-[ext_resource type="Script" uid="uid://k18g2bokbfn4" path="res://room/build_system.gd" id="2_b07f3"]
+[ext_resource type="Script" path="res://room/build_system.gd" id="2_b07f3"]
 [ext_resource type="PackedScene" uid="uid://4eki364smjfx" path="res://room/building.tscn" id="3_6kngx"]
 [ext_resource type="PackedScene" uid="uid://be71e7in0blky" path="res://room/inventory.tscn" id="4_abt81"]
 
