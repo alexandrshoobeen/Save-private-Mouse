@@ -10,9 +10,15 @@ config_version=5
 
 [application]
 
+<<<<<<< HEAD
 config/name="little_mouse"
 run/main_scene="uid://be71e7in0blky"
 config/features=PackedStringArray("4.5", "Forward Plus")
+=======
+config/name="Save private Mouse"
+run/main_scene="res://menu.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+>>>>>>> 4adacb22d1d39d5c44e86cf4b7c3d231fdf666b7
 config/icon="res://icon.svg"
 
 [editor]

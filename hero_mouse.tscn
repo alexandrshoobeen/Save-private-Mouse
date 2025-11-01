@@ -1,9 +1,5 @@
-[gd_scene load_steps=2 format=3 uid="uid://cg857j4qclu32"]
-
-[ext_resource type="Texture2D" uid="uid://dyg0w7r1wy0dx" path="res://icon.svg" id="1_fpyjf"]
+[gd_scene format=3 uid="uid://cg857j4qclu32"]
 
 [node name="HeroMouse" type="Node2D"]
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(194, 291)
-texture = ExtResource("1_fpyjf")
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
