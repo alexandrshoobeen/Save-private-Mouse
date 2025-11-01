@@ -1,5 +1,12 @@
-[gd_scene format=3 uid="uid://cg857j4qclu32"]
+[gd_scene load_steps=3 format=3 uid="uid://cg857j4qclu32"]
+
+[ext_resource type="Script" path="res://hero_mouse.gd" id="1_5i1f4"]
+[ext_resource type="Texture2D" uid="uid://dyg0w7r1wy0dx" path="res://icon.svg" id="1_wx3x3"]
 
 [node name="HeroMouse" type="Node2D"]
+position = Vector2(222, 561)
+script = ExtResource("1_5i1f4")
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(1, 2)
+texture = ExtResource("1_wx3x3")
