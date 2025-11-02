@@ -1,46 +1,74 @@
 extends Node2D
 
-@export var tilemap_layer: TileMapLayer
-@export var object_scene: PackedScene
-@export var tile_width := 32
-@export var tile_height := 16
+@export var tilemap_layer: TileMapLayer       # Your TileMapLayer node
+@export var tile_width: int = 32
+@export var tile_height: int = 16
 
-var itemsLoad = ["res://room/ItemsResources/Bow.tres", "res://room/ItemsResources/Sword.tres"]
+var preview: Sprite2D = null
+var current_item_data: ItemData = null
 
-var preview: Node2D
+const ACTION_PLACE := "mouse_left"
+const ACTION_CANCEL := "ui_cancel"
 
-func _ready() -> void:
-	preview = object_scene.instantiate()
+# ------------------- Drag start -------------------
+func start_preview(item_data: ItemData) -> void:
+	current_item_data = item_data
+	if preview:
+		preview.queue_free()
+	preview = Sprite2D.new()
+	preview.texture = item_data.texture
+	preview.modulate = Color(1,1,1,0.5)
+	preview.centered = true
 	add_child(preview)
-	preview.modulate = Color(1,1,1,0.5)  # Полупрозрачный
-	preview.z_index = 100
+	preview.z_index = 10000
 
+# ------------------- Process preview -------------------
 func _process(_delta: float) -> void:
-	var mouse_pos = get_global_mouse_position()
-	var cell = tilemap_layer.local_to_map(mouse_pos)
+	if not preview or not current_item_data or not tilemap_layer:
+		return
+
+	var local_mouse = tilemap_layer.to_local(get_global_mouse_position())
+	var cell = tilemap_layer.local_to_map(local_mouse)
 	var iso_pos = _cell_to_iso(cell) + Vector2(tile_width/2, 0)
 
-	# Превью точно над тайлом
-	preview.global_position = iso_pos
-	preview.z_index = int(iso_pos.y)
+	preview.global_position = tilemap_layer.to_global(iso_pos)
+	preview.z_index = int(preview.global_position.y)
 
-	var can_build = _can_place(cell)
-	preview.modulate = Color(0,1,0,0.5) if can_build else Color(0.011, 0.277, 1.0, 0.5)
+	var can_place = _can_place(cell)
+	preview.modulate = Color(0,1,0,0.5) if can_place else Color(1,0,0,0.5)
 
-	if Input.is_mouse_button_pressed(MouseButton.MOUSE_BUTTON_LEFT) and can_build:
-		_place_object(iso_pos)
+	if can_place and Input.is_key_pressed(Key.KEY_ENTER):
+		_place_object(cell)
+		_stop_preview()
 
-func _cell_to_iso(cell: Vector2i) -> Vector2:
-	return Vector2(
-		(cell.x - cell.y) * (tile_width / 2),
-		(cell.x + cell.y) * (tile_height / 2)
-	)
+	if Input.is_action_just_pressed(ACTION_CANCEL) or Input.is_mouse_button_pressed(MouseButton.MOUSE_BUTTON_RIGHT):
+		_stop_preview()
 
+# ------------------- Check placement -------------------
 func _can_place(cell: Vector2i) -> bool:
 	return tilemap_layer.get_cell_source_id(cell) != -1
 
-func _place_object(pos: Vector2) -> void:
-	var obj = object_scene.instantiate()
-	obj.global_position = pos
-	obj.z_index = int(pos.y)  # Ставим поверх тайлов
+# ------------------- Place object -------------------
+func _place_object(cell: Vector2i) -> void:
+	if not current_item_data or not tilemap_layer:
+		return
+
+	var obj = Sprite2D.new()
+	obj.texture = current_item_data.texture
+	var iso_pos = _cell_to_iso(cell) + Vector2(tile_width/2, 0)
+	obj.global_position = tilemap_layer.to_global(iso_pos)
+	obj.z_index = int(obj.global_position.y)
 	add_child(obj)
+
+# ------------------- Stop preview -------------------
+func _stop_preview() -> void:
+	if preview:
+		preview.queue_free()
+	preview = null
+	current_item_data = null
+
+# ------------------- Helper: cell → isometric coordinates -------------------
+func _cell_to_iso(cell: Vector2i) -> Vector2:
+	var x = (cell.x - cell.y) * (tile_width / 2)
+	var y = (cell.x + cell.y) * (tile_height / 2)
+	return Vector2(x, y)

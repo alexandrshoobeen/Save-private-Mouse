@@ -1,6 +1,8 @@
 extends CanvasLayer
 
-var InvSize = 16
+@onready var placement: Node2D = $"../../BuildSystem"
+
+var InvSize = 4
 var itemsLoad = ["res://room/ItemsResources/Bow.tres", "res://room/ItemsResources/Sword.tres"]
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -14,8 +16,10 @@ func _ready() -> void:
 		var item = InventoryItem.new()
 		item.init(load(itemsLoad[i]))
 		%Inv.get_child(i).add_child(item)
+		# In Placement.gd
+		item.connect("drag_started", Callable(self, "_on_drag_started"))
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func _on_drag_started(item_data: ItemData) -> void:
+	print("Drag started:", item_data.name)
+	if %BuildSystem.has_method("start_preview"):
+		%BuildSystem.start_preview(item_data)
