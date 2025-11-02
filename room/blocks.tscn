@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=4 uid="uid://bgak4262np3m3"]
+[gd_scene load_steps=6 format=4 uid="uid://bgak4262np3m3"]
 
 [ext_resource type="Texture2D" uid="uid://bjgmgr4omgxur" path="res://assets/iso_tileset.png" id="1_v0nwp"]
 [ext_resource type="Script" uid="uid://k18g2bokbfn4" path="res://room/build_system.gd" id="2_b07f3"]
-[ext_resource type="PackedScene" uid="uid://4eki364smjfx" path="res://room/building.tscn" id="3_6kngx"]
-[ext_resource type="PackedScene" uid="uid://be71e7in0blky" path="res://room/inventory.tscn" id="4_abt81"]
+[ext_resource type="Script" uid="uid://du4xia5y6qsia" path="res://room/gui.gd" id="4_v0nwp"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6ecdo"]
 texture = ExtResource("1_v0nwp")
@@ -61,29 +60,25 @@ tile_map_data = PackedByteArray("AAAiAAMAAAABAAAAAAAiAAQAAAABAAAAAAAjAAMAAAABAAA
 tile_set = SubResource("TileSet_ph8b8")
 y_sort_origin = 1
 
-[node name="TileMapLayer3" type="TileMapLayer" parent="."]
-visible = false
-z_index = 1
-y_sort_enabled = true
-tile_map_data = PackedByteArray("AAAiAAMAAAABAAAAAAAiAAQAAAABAAAAAAAjAAMAAAABAAAAAAAjAAQAAAABAAAAAAAkAAQAAAABAAAAAAAlAAQAAAABAAAAAAAiAAUAAAABAAAAAAAkAAMAAAABAAAAAAAkAAUAAAABAAAAAAAlAAMAAAABAAAAAAAlAAUAAAABAAAAAAAmAAUAAAABAAAAAAAnAAUAAAABAAAAAAAoAAUAAAABAAAAAAApAAUAAAABAAAAAAAqAAUAAAAFAAAAAAArAAUAAAAFAAAAAAAsAAUAAAAGAAAAAAAjAAUAAAABAAAAAAA=")
-tile_set = SubResource("TileSet_ph8b8")
-y_sort_origin = 1
-
-[node name="Node2D" type="Node2D" parent="."]
-visible = false
-y_sort_enabled = true
-
-[node name="TileMapLayer3" type="TileMapLayer" parent="Node2D"]
-visible = false
-z_index = 2
-y_sort_enabled = true
-tile_map_data = PackedByteArray("AAAEAP//AAAAAAAAAAADAP//AAAAAAAAAAACAP//AAAAAAAAAAABAP//AAAAAAAAAAAEAP7/AAAAAAAAAAAEAP3/AAAAAAAAAAADAP3/AAAAAAAAAAADAP7/AAAAAAAAAAACAP3/AAAAAAAAAAACAP7/AAAAAAAAAAABAP7/AAAAAAAAAAABAP3/AAAAAAAAAAA=")
-tile_set = SubResource("TileSet_ph8b8")
-y_sort_origin = 2
-
 [node name="BuildSystem" type="Node2D" parent="." node_paths=PackedStringArray("tilemap_layer")]
+unique_name_in_owner = true
 script = ExtResource("2_b07f3")
 tilemap_layer = NodePath("../TileMapLayer2")
-object_scene = ExtResource("3_6kngx")
 
-[node name="Scene" parent="." instance=ExtResource("4_abt81")]
+[node name="GUI" type="CanvasLayer" parent="."]
+script = ExtResource("4_v0nwp")
+
+[node name="Panel" type="Panel" parent="GUI"]
+visible = false
+offset_left = 21.0
+offset_top = 31.0
+offset_right = 262.0
+offset_bottom = 228.0
+
+[node name="Inv" type="GridContainer" parent="GUI"]
+unique_name_in_owner = true
+offset_left = 20.0
+offset_top = 39.0
+offset_right = 263.0
+offset_bottom = 227.0
+columns = 4
