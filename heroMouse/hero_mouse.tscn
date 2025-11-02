@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cg857j4qclu32"]
+[gd_scene load_steps=16 format=3 uid="uid://cg857j4qclu32"]
 
 [ext_resource type="Script" uid="uid://bdjaxccn7hw6m" path="res://heroMouse/hero_mouse.gd" id="1_5i1f4"]
 [ext_resource type="Texture2D" uid="uid://vtuvb5imqhxm" path="res://heroMouse/мышимыши2.0.png" id="2_mbcqr"]
@@ -28,6 +28,18 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(0.4, 0.4)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_xxnsd"]
@@ -145,9 +157,26 @@ tracks/1/keys = {
 "values": [Vector2(-0.4, 0.4), Vector2(-0.4, 0.4)]
 }
 
+[sub_resource type="Animation" id="Animation_e5lrm"]
+resource_name = "falling_mouse"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xxnsd"]
 _data = {
 &"RESET": SubResource("Animation_7wcx0"),
+&"falling_mouse": SubResource("Animation_e5lrm"),
 &"idle_left": SubResource("Animation_xxnsd"),
 &"idle_right": SubResource("Animation_wkr5k"),
 &"walk_left": SubResource("Animation_mbcqr"),

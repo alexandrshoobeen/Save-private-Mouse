@@ -1,9 +1,13 @@
 extends Node2D
 
 @onready var predator_awaking: Area2D = $PredatorAwaking
+@onready var get_up_area: Area2D = $"get up"
+@onready var jump_area: Area2D = $jump_area
 @onready var predator_node: Node2D = $predator
+@onready var trash_node: Node2D = $Trash
 var hero_mouse: CharacterBody2D = null
 var predator_awakened: bool = false
+var is_jumping_to_trash: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,6 +21,29 @@ func _ready() -> void:
 		predator_awaking.area_entered.connect(_on_predator_awaking_area_entered)
 		predator_awaking.area_exited.connect(_on_predator_awaking_area_exited)
 		print("PredatorAwaking area set up and monitoring: ", predator_awaking.monitoring)
+	
+	# Set up "get up" area
+	if get_up_area:
+		get_up_area.monitoring = true
+		get_up_area.monitorable = false
+		get_up_area.body_entered.connect(_on_get_up_area_body_entered)
+		get_up_area.body_exited.connect(_on_get_up_area_body_exited)
+		print("[HOUSE] Get up area set up and monitoring: ", get_up_area.monitoring)
+		print("[HOUSE] Get up area position: ", get_up_area.global_position)
+		var shape_node = get_up_area.get_node("CollisionShape2D")
+		if shape_node:
+			print("[HOUSE] Get up area CollisionShape2D position: ", shape_node.global_position)
+	else:
+		print("[HOUSE] ERROR: get_up_area is null!")
+	
+	# Set up "jump_area"
+	if jump_area:
+		jump_area.monitoring = true
+		jump_area.monitorable = false
+		jump_area.body_entered.connect(_on_jump_area_body_entered)
+		print("[HOUSE] Jump area set up and monitoring: ", jump_area.monitoring)
+	else:
+		print("[HOUSE] ERROR: jump_area is null!")
 	
 	# Create and add hero_mouse
 	var hero_mouse_scene = preload("res://heroMouse/hero_mouse.tscn")
@@ -62,6 +89,38 @@ func _process(_delta: float) -> void:
 				if predator_node and predator_node.has_method("fall_asleep"):
 					predator_node.fall_asleep()
 					predator_awakened = false
+	
+	# Manual check for "get up" area (backup check)
+	if hero_mouse and get_up_area:
+		var zone_shape_node = get_up_area.get_node("CollisionShape2D")
+		if zone_shape_node and zone_shape_node.shape is RectangleShape2D:
+			var rect_shape = zone_shape_node.shape as RectangleShape2D
+			var zone_transform = zone_shape_node.global_transform
+			var zone_pos = zone_transform.origin
+			var zone_size = rect_shape.size
+			
+			var zone_rect = Rect2(
+				zone_pos.x - zone_size.x / 2,
+				zone_pos.y - zone_size.y / 2,
+				zone_size.x,
+				zone_size.y
+			)
+			
+			var mouse_pos = hero_mouse.global_position
+			var is_in_get_up_zone = zone_rect.has_point(mouse_pos)
+			var current_vertical_state = false
+			if "can_move_vertically" in hero_mouse:
+				current_vertical_state = hero_mouse.can_move_vertically
+			
+			if is_in_get_up_zone and not current_vertical_state:
+				print("[HOUSE] 🔵 MANUAL CHECK: hero_mouse at ", mouse_pos, " is in get_up zone!")
+				print("[HOUSE] Current can_move_vertically: ", current_vertical_state)
+				if hero_mouse.has_method("enable_vertical_movement"):
+					hero_mouse.enable_vertical_movement()
+			elif not is_in_get_up_zone and current_vertical_state == true:
+				print("[HOUSE] 🔴 MANUAL CHECK: hero_mouse left get_up zone!")
+				if hero_mouse.has_method("disable_vertical_movement"):
+					hero_mouse.disable_vertical_movement()
 
 
 func _on_predator_awaking_body_entered(body: Node) -> void:
@@ -106,3 +165,111 @@ func _on_predator_awaking_area_exited(area: Area2D) -> void:
 		if predator_node and predator_node.has_method("fall_asleep"):
 			predator_node.fall_asleep()
 			predator_awakened = false
+
+
+func _on_get_up_area_body_entered(body: Node) -> void:
+	print("[HOUSE] 🔵 Body entered get up area: ", body.name, " | Path: ", body.get_path())
+	print("[HOUSE] Body type: ", body.get_class())
+	if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
+		print("[HOUSE] ✅ Hero mouse detected! Checking for enable_vertical_movement method...")
+		if body.has_method("enable_vertical_movement"):
+			print("[HOUSE] ✅ Method found! Calling enable_vertical_movement()...")
+			body.enable_vertical_movement()
+			print("[HOUSE] ✅ Method called successfully")
+		else:
+			print("[HOUSE] ❌ ERROR: enable_vertical_movement method NOT FOUND!")
+			print("[HOUSE] Available methods:", body.get_method_list())
+	else:
+		print("[HOUSE] Body is not HeroMouse. Body name: '", body.name, "' | Path contains 'HeroMouse': ", "HeroMouse" in str(body.get_path()))
+
+
+func _on_get_up_area_body_exited(body: Node) -> void:
+	print("[HOUSE] 🔴 Body exited get up area: ", body.name, " | Path: ", body.get_path())
+	if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
+		print("[HOUSE] ✅ Hero mouse left! Checking for disable_vertical_movement method...")
+		if body.has_method("disable_vertical_movement"):
+			print("[HOUSE] ✅ Method found! Calling disable_vertical_movement()...")
+			body.disable_vertical_movement()
+			print("[HOUSE] ✅ Method called successfully")
+		else:
+			print("[HOUSE] ❌ ERROR: disable_vertical_movement method NOT FOUND!")
+	else:
+		print("[HOUSE] Body is not HeroMouse")
+
+
+func _on_jump_area_body_entered(body: Node) -> void:
+	print("[HOUSE] 🦘 Body entered jump_area: ", body.name, " | Path: ", body.get_path())
+	if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
+		if not is_jumping_to_trash:
+			print("[HOUSE] ✅ Hero mouse detected in jump_area! Starting jump animation...")
+			_start_jump_to_trash_animation(body)
+
+
+func _start_jump_to_trash_animation(mouse: CharacterBody2D) -> void:
+	if is_jumping_to_trash:
+		return  # Already animating
+	
+	is_jumping_to_trash = true
+	print("[HOUSE] Starting jump animation...")
+	
+	# Disable physics for hero_mouse
+	mouse.set_physics_process(false)
+	print("[HOUSE] Physics disabled for hero_mouse")
+	
+	# Get positions
+	var start_pos = mouse.global_position
+	var trash_pos = trash_node.global_position
+	print("[HOUSE] Mouse start position: ", start_pos)
+	print("[HOUSE] Trash position: ", trash_pos)
+	
+	# Create Tween for animation
+	var tween = create_tween()
+	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.tween_method(
+		func(pos): mouse.global_position = pos,
+		start_pos,
+		trash_pos,
+		1.0  # Animation duration in seconds
+	)
+	
+	# Wait for animation to complete, then hide mouse and start trash animation
+	tween.tween_callback(func(): _on_jump_animation_complete(mouse))
+
+
+func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
+	print("[HOUSE] Jump animation completed!")
+	
+	# Hide hero_mouse
+	mouse.visible = false
+	print("[HOUSE] Hero mouse hidden")
+	
+	# Start falling animation for trash
+	if trash_node:
+		var animation_tree = trash_node.get_node_or_null("AnimationTree")
+		if animation_tree:
+			# Try to get state machine playback (it should exist automatically for state machines)
+			var state_machine = animation_tree.get("parameters/playback")
+			if state_machine:
+				state_machine.travel("falling")
+				print("[HOUSE] ✅ Falling animation started for trash (via AnimationTree)")
+			else:
+				# Fallback to AnimationPlayer if state machine doesn't work
+				var animation_player = trash_node.get_node_or_null("AnimationPlayer")
+				if animation_player:
+					animation_player.play("falling")
+					print("[HOUSE] ✅ Falling animation started for trash (via AnimationPlayer fallback)")
+				else:
+					print("[HOUSE] ❌ ERROR: Could not start falling animation")
+		else:
+			# Fallback: try AnimationPlayer directly
+			var animation_player = trash_node.get_node_or_null("AnimationPlayer")
+			if animation_player:
+				animation_player.play("falling")
+				print("[HOUSE] ✅ Falling animation started for trash (via AnimationPlayer direct)")
+			else:
+				print("[HOUSE] ❌ ERROR: No AnimationTree or AnimationPlayer found in trash")
+	else:
+		print("[HOUSE] ❌ ERROR: trash_node is null")
+	
+	is_jumping_to_trash = false

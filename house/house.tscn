@@ -1,11 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://cd1v6vfr5d5bg"]
+[gd_scene load_steps=9 format=3 uid="uid://cd1v6vfr5d5bg"]
 
 [ext_resource type="Script" uid="uid://wnyhb38yx81h" path="res://house/house.gd" id="1_wlv5f"]
 [ext_resource type="Texture2D" uid="uid://8jg5ijrrenhn" path="res://house/background.png" id="2_05tlr"]
 [ext_resource type="PackedScene" uid="uid://d15ipns2c352u" path="res://predator/predator.tscn" id="3_t6m4b"]
+[ext_resource type="PackedScene" uid="uid://ys58bgk7828v" path="res://house/trash.tscn" id="4_nxes2"]
+[ext_resource type="PackedScene" uid="uid://0trk2enc24jr" path="res://house/tumba.tscn" id="5_q8k63"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6m4b"]
 size = Vector2(412, 97)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q8k63"]
+size = Vector2(79, 481)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mkffg"]
+size = Vector2(65, 57.5)
 
 [node name="level" type="Node2D"]
 script = ExtResource("1_wlv5f")
@@ -29,3 +37,23 @@ position = Vector2(2962, 389)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PredatorAwaking"]
 position = Vector2(2792, 576)
 shape = SubResource("RectangleShape2D_t6m4b")
+
+[node name="Trash" parent="." instance=ExtResource("4_nxes2")]
+position = Vector2(4863, 426)
+scale = Vector2(0.7, 0.7)
+
+[node name="tumba" parent="." instance=ExtResource("5_q8k63")]
+position = Vector2(4310, 310)
+scale = Vector2(1.6, 1.6)
+
+[node name="get up" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="get up"]
+position = Vector2(3994.5, 321.5)
+shape = SubResource("RectangleShape2D_q8k63")
+
+[node name="jump_area" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="jump_area"]
+position = Vector2(4639, 65)
+shape = SubResource("RectangleShape2D_mkffg")
