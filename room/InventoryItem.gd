@@ -16,11 +16,17 @@ func _ready() -> void:
 	texture = data.texture
 	tooltip_text = "%s\n%s" % [data.name, data.description]
 	
-func _get_drag_data(at_position: Vector2) -> Variant:
-	#set_drag_preview(make_drag_preview(at_position))
-	print("DRAG STARTED")
-	emit_signal("drag_started", data)
-	return self
+#func _get_drag_data(at_position: Vector2) -> Variant:
+	##set_drag_preview(make_drag_preview(at_position))
+	#print("DRAG STARTED")
+	#emit_signal("drag_started", data)
+	#return self
+	
+func _gui_input(event):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		print("CLICK STARTED")
+		emit_signal("drag_started", data)
+
 	
 func make_drag_preview(at_position: Vector2):
 	var t = TextureRect.new()
