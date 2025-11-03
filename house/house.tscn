@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cd1v6vfr5d5bg"]
+[gd_scene load_steps=15 format=3 uid="uid://cd1v6vfr5d5bg"]
 
 [ext_resource type="Script" uid="uid://wnyhb38yx81h" path="res://house/house.gd" id="1_wlv5f"]
 [ext_resource type="Texture2D" uid="uid://8jg5ijrrenhn" path="res://house/background.png" id="2_05tlr"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://0trk2enc24jr" path="res://house/tumba.tscn" id="5_q8k63"]
 [ext_resource type="PackedScene" uid="uid://dil4c1lnq2n57" path="res://house/threads.tscn" id="8_ahhpa"]
 [ext_resource type="Texture2D" uid="uid://f0y5cajna1yd" path="res://house/норка2.0.png" id="8_eev5h"]
+[ext_resource type="Texture2D" uid="uid://dhktoqpp803v5" path="res://house/норка2.1.png" id="9_eev5h"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6m4b"]
 size = Vector2(412, 97)
@@ -60,7 +61,7 @@ position = Vector2(2962.0002, 346)
 [node name="PredatorAwaking" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PredatorAwaking"]
-position = Vector2(2792, 576)
+position = Vector2(2811, 550)
 shape = SubResource("RectangleShape2D_t6m4b")
 
 [node name="get up" type="Area2D" parent="."]
@@ -81,11 +82,17 @@ position = Vector2(576, 324)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("8_eev5h")
 
+[node name="Backgroundstart2" type="Sprite2D" parent="."]
+z_index = 100
+position = Vector2(576, 324)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("9_eev5h")
+
 [node name="threads" parent="." instance=ExtResource("8_ahhpa")]
 position = Vector2(4780, 46)
 
 [node name="entering_room" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="entering_room"]
-position = Vector2(302, 404)
+position = Vector2(249, 391)
 shape = SubResource("CircleShape2D_jg0ij")

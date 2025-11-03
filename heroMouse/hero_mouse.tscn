@@ -236,7 +236,7 @@ hframes = 2
 vframes = 2
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(252, -223)
+position = Vector2(252, -193)
 process_callback = 0
 limit_enabled = false
 position_smoothing_enabled = true
