@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_4kalo")
 type = 4
-name = "Sword"
-description = "This is powerful sword"
+name = "One cube"
+description = "This is one cube"
 texture = ExtResource("2_ignaw")
 width = 187
 height = 187

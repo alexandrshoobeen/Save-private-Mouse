@@ -6,9 +6,9 @@
 [resource]
 script = ExtResource("1_lwtud")
 type = 4
-name = "Sword"
-description = "This is powerful sword"
+name = "Box"
+description = "This is box"
 texture = ExtResource("2_lwtud")
 width = 256
-height = 150
+height = 152
 size = Vector2i(2, 2)

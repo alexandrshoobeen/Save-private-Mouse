@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource("1_tviyk")
 type = 4
-name = "Sword"
-description = "This is powerful sword"
+name = "MatchBox"
+description = "This is match box"
 texture = ExtResource("2_tviyk")
 width = 320
 height = 226

@@ -93,7 +93,13 @@ tile_size = Vector2i(128, 74)
 sources/4 = SubResource("TileSetAtlasSource_v0nwp")
 
 [node name="blocks" type="Node2D"]
+
+[node name="BuildSystem" type="Node2D" parent="." node_paths=PackedStringArray("tilemap_layer")]
+unique_name_in_owner = true
+z_index = 150
 y_sort_enabled = true
+script = ExtResource("2_b07f3")
+tilemap_layer = NodePath("../TileMapLayer")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
 z_index = 1
@@ -102,11 +108,6 @@ tile_map_data = PackedByteArray("AAAqABgAAQAAAAAAAAAHAP3/BAAAAAAAAAAHAP7/BAAAAAA
 tile_set = SubResource("TileSet_ph8b8")
 y_sort_origin = 1
 physics_quadrant_size = 64
-
-[node name="BuildSystem" type="Node2D" parent="." node_paths=PackedStringArray("tilemap_layer")]
-unique_name_in_owner = true
-script = ExtResource("2_b07f3")
-tilemap_layer = NodePath("../TileMapLayer")
 
 [node name="GUI" type="CanvasLayer" parent="."]
 script = ExtResource("4_v0nwp")
