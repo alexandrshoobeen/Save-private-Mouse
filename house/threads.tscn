@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dil4c1lnq2n57"]
+
+[ext_resource type="Texture2D" uid="uid://cg82ixkfapk6c" path="res://house/ниточки.png" id="1_ydx2q"]
+
+[node name="threads" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("1_ydx2q")
