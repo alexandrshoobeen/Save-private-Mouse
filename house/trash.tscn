@@ -1,6 +1,21 @@
-[gd_scene load_steps=7 format=3 uid="uid://ys58bgk7828v"]
+[gd_scene load_steps=7 format=3 uid="uid://bompm0cl2ylex"]
 
-[ext_resource type="Texture2D" uid="uid://bv5imuobbp83t" path="res://house/trash can.png" id="1_30m5c"]
+[ext_resource type="Texture2D" uid="uid://tp5n7erg0fop" path="res://house/ведёркоупало.png" id="1_30m5c"]
+
+[sub_resource type="Animation" id="Animation_rllnd"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
 
 [sub_resource type="Animation" id="Animation_30m5c"]
 resource_name = "falling"
@@ -16,21 +31,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [0, 1, 2]
-}
-
-[sub_resource type="Animation" id="Animation_rllnd"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_nmf05"]
@@ -49,7 +49,8 @@ states/falling/position = Vector2(428, 111)
 [node name="Trash" type="Node2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(-164, -421)
+position = Vector2(-182, -437)
+scale = Vector2(0.7, 0.7)
 texture = ExtResource("1_30m5c")
 centered = false
 hframes = 3

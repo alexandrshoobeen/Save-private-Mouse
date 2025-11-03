@@ -125,7 +125,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Camera2D/Sprite2D:modulate:a")
+tracks/0/path = NodePath("Camera2D/Sprite2D3:modulate:a")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -137,7 +137,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Camera2D/Sprite2D:visible")
+tracks/1/path = NodePath("Camera2D/Sprite2D3:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -558,6 +558,7 @@ height = 102.0
 script = ExtResource("1_5i1f4")
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
+visibility_layer = 16
 scale = Vector2(0.37, 0.37)
 texture = ExtResource("2_hn2ls")
 hframes = 2
@@ -575,10 +576,9 @@ limit_enabled = false
 position_smoothing_enabled = true
 script = SubResource("GDScript_mbcqr")
 
-[node name="Sprite2D" type="Sprite2D" parent="Camera2D"]
+[node name="Sprite2D3" type="Sprite2D" parent="Camera2D"]
 visible = false
 modulate = Color(1, 1, 1, 0)
-position = Vector2(-9.536743e-07, 6.67572e-06)
 scale = Vector2(18.000002, 10.125)
 texture = SubResource("GradientTexture2D_7wcx0")
 
