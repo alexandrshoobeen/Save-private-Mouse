@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2ucoow0pvku6"
-path="res://.godot/imported/tumba.png-b84b1d76b48385cde6b701b7485aa180.ctex"
+uid="uid://bg1g673vonnth"
+path="res://.godot/imported/подушечка.png-a29fc0052a98a00b038bfe9ace996686.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://house/tumba.png"
-dest_files=["res://.godot/imported/tumba.png-b84b1d76b48385cde6b701b7485aa180.ctex"]
+source_file="res://house/подушечка.png"
+dest_files=["res://.godot/imported/подушечка.png-a29fc0052a98a00b038bfe9ace996686.ctex"]
 
 [params]
 
