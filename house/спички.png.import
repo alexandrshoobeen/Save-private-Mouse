@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7kit3xt8px2h"
-path="res://.godot/imported/мыши.png-0916a96526ee7494750ca1002dfc15f7.ctex"
+uid="uid://l67ehr7bgtdv"
+path="res://.godot/imported/спички.png-2c0f65f5c46a7b8245a06782b85d5c81.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://heroMouse/мыши.png"
-dest_files=["res://.godot/imported/мыши.png-0916a96526ee7494750ca1002dfc15f7.ctex"]
+source_file="res://house/спички.png"
+dest_files=["res://.godot/imported/спички.png-2c0f65f5c46a7b8245a06782b85d5c81.ctex"]
 
 [params]
 

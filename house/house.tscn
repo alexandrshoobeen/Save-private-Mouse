@@ -1,31 +1,98 @@
-[gd_scene load_steps=5 format=3 uid="uid://cd1v6vfr5d5bg"]
+[gd_scene load_steps=15 format=3 uid="uid://cd1v6vfr5d5bg"]
 
 [ext_resource type="Script" uid="uid://wnyhb38yx81h" path="res://house/house.gd" id="1_wlv5f"]
 [ext_resource type="Texture2D" uid="uid://8jg5ijrrenhn" path="res://house/background.png" id="2_05tlr"]
+[ext_resource type="Texture2D" uid="uid://daf4le7v8vt0e" path="res://house/спотолком.png" id="2_jg0ij"]
+[ext_resource type="Texture2D" uid="uid://bg1g673vonnth" path="res://house/подушечка.png" id="3_mkffg"]
 [ext_resource type="PackedScene" uid="uid://d15ipns2c352u" path="res://predator/predator.tscn" id="3_t6m4b"]
+[ext_resource type="PackedScene" path="res://house/trash.tscn" id="4_nxes2"]
+[ext_resource type="PackedScene" path="res://house/tumba.tscn" id="5_q8k63"]
+[ext_resource type="PackedScene" path="res://house/threads.tscn" id="8_ahhpa"]
+[ext_resource type="Texture2D" uid="uid://f0y5cajna1yd" path="res://house/норка2.0.png" id="8_eev5h"]
+[ext_resource type="Texture2D" uid="uid://dhktoqpp803v5" path="res://house/норка2.1.png" id="9_eev5h"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6m4b"]
 size = Vector2(412, 97)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_q8k63"]
+size = Vector2(79, 481)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mkffg"]
+size = Vector2(65, 57.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jg0ij"]
+radius = 120.30378
 
 [node name="level" type="Node2D"]
 script = ExtResource("1_wlv5f")
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+scroll_offset = Vector2(1, 0)
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_scale = Vector2(1, 0)
 motion_mirroring = Vector2(1080, 0)
 
+[node name="ceiling" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
+position = Vector2(576, -227)
+scale = Vector2(0.6, 1)
+texture = ExtResource("2_jg0ij")
+
 [node name="Interior" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
-position = Vector2(576, 324.00003)
+position = Vector2(576, 324)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("2_05tlr")
 
+[node name="tumba" parent="." instance=ExtResource("5_q8k63")]
+position = Vector2(4570, 286.00003)
+scale = Vector2(1.6, 1.6000001)
+
+[node name="Trash" parent="." instance=ExtResource("4_nxes2")]
+position = Vector2(5241.0005, 537)
+scale = Vector2(0.7, 0.7)
+
+[node name="Подушечка" type="Sprite2D" parent="."]
+position = Vector2(2946, 284)
+scale = Vector2(0.4, 0.6)
+texture = ExtResource("3_mkffg")
+
 [node name="predator" parent="." instance=ExtResource("3_t6m4b")]
-position = Vector2(2962, 389)
+position = Vector2(2962.0002, 346)
 
 [node name="PredatorAwaking" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PredatorAwaking"]
-position = Vector2(2792, 576)
+position = Vector2(2811, 550)
 shape = SubResource("RectangleShape2D_t6m4b")
+
+[node name="get up" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="get up"]
+position = Vector2(4234, 322)
+shape = SubResource("RectangleShape2D_q8k63")
+
+[node name="jump_area" type="Area2D" parent="."]
+position = Vector2(429, 21)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="jump_area"]
+position = Vector2(4639, 65)
+shape = SubResource("RectangleShape2D_mkffg")
+
+[node name="Backgroundstart" type="Sprite2D" parent="."]
+position = Vector2(576, 324)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("8_eev5h")
+
+[node name="Backgroundstart2" type="Sprite2D" parent="."]
+z_index = 100
+position = Vector2(576, 324)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("9_eev5h")
+
+[node name="threads" parent="." instance=ExtResource("8_ahhpa")]
+position = Vector2(4780, 46)
+
+[node name="entering_room" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="entering_room"]
+position = Vector2(249, 391)
+shape = SubResource("CircleShape2D_jg0ij")

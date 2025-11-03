@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0t5ocep4ylg"
-path="res://.godot/imported/мышьбежит1.png-2e212603aa1298b69f8cb34b67b54fc8.ctex"
+uid="uid://dhktoqpp803v5"
+path="res://.godot/imported/норка2.1.png-9edd415e1de8dc175d806560e7210ac1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://heroMouse/мышьбежит1.png"
-dest_files=["res://.godot/imported/мышьбежит1.png-2e212603aa1298b69f8cb34b67b54fc8.ctex"]
+source_file="res://house/норка2.1.png"
+dest_files=["res://.godot/imported/норка2.1.png-9edd415e1de8dc175d806560e7210ac1.ctex"]
 
 [params]
 
