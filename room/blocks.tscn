@@ -1,8 +1,8 @@
 [gd_scene load_steps=13 format=4 uid="uid://bgak4262np3m3"]
 
 [ext_resource type="Texture2D" uid="uid://bfrbr2n7oi8i4" path="res://assets/Иллюстрация_без_названия 2.png" id="2_2v5s1"]
+[ext_resource type="Texture2D" uid="uid://drtprbg3hopw7" path="res://assets/Свеча горит.png" id="2_6kngx"]
 [ext_resource type="Script" uid="uid://k18g2bokbfn4" path="res://room/build_system.gd" id="2_b07f3"]
-[ext_resource type="Texture2D" uid="uid://dwowfa1e1luir" path="res://assets/Свечка.png" id="4_b07f3"]
 [ext_resource type="Script" uid="uid://du4xia5y6qsia" path="res://room/gui.gd" id="4_v0nwp"]
 [ext_resource type="Texture2D" uid="uid://c1lm0j271f0qr" path="res://assets/Стена_правая.png" id="5_b07f3"]
 [ext_resource type="Texture2D" uid="uid://ddrreu5fagxa3" path="res://assets/Левая_стена-1.png" id="6_6kngx"]
@@ -308,6 +308,11 @@ z_index = 202
 script = ExtResource("2_b07f3")
 tilemap_layer = NodePath("../TileMapLayer")
 
+[node name="Sprite2D" type="Sprite2D" parent="BuildSystem"]
+z_index = 1
+position = Vector2(637, 390)
+texture = ExtResource("2_6kngx")
+
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
 z_index = 1
 tile_map_data = PackedByteArray("AAAqABgAAQAAAAAAAAAFAP3/AQAAAAAAAAAFAP7/AQAAAAAAAAAFAP//AQAAAAAAAAAFAAAAAQAAAAAAAAAFAAEAAQAAAAAAAAAFAAIAAQAAAAAAAAAFAAMAAQAAAAAAAAAGAP3/AQAAAAAAAAAGAP7/AQAAAAAAAAAGAP//AQAAAAAAAAAGAAAAAQAAAAAAAAAGAAEAAQAAAAAAAAAGAAIAAQAAAAAAAAAGAAMAAQAAAAAAAAAHAP3/AQAAAAAAAAAHAP7/AQAAAAAAAAAHAP//AQAAAAAAAAAHAAAAAQAAAAAAAAAHAAEAAQAAAAAAAAAHAAIAAQAAAAAAAAAHAAMAAQAAAAAAAAAIAP3/AQAAAAAAAAAIAP7/AQAAAAAAAAAIAP//AQAAAAAAAAAIAAAAAQAAAAAAAAAIAAEAAQAAAAAAAAAIAAIAAQAAAAAAAAAIAAMAAQAAAAAAAAAJAP3/AQAAAAAAAAAJAP7/AQAAAAAAAAAJAP//AQAAAAAAAAAJAAAAAQAAAAAAAAAJAAEAAQAAAAAAAAAJAAIAAQAAAAAAAAAJAAMAAQAAAAAAAAAKAP3/AQAAAAAAAAAKAP7/AQAAAAAAAAAKAP//AQAAAAAAAAAKAAAAAQAAAAAAAAAKAAEAAQAAAAAAAAAKAAIAAQAAAAAAAAAKAAMAAQAAAAAAAAALAP3/AQAAAAAAAAALAP7/AQAAAAAAAAALAP//AQAAAAAAAAALAAAAAQAAAAAAAAALAAEAAQAAAAAAAAALAAIAAQAAAAAAAAALAAMAAQAAAAAAAAA=")
@@ -332,11 +337,6 @@ offset_right = 247.0
 offset_bottom = 188.0
 columns = 4
 metadata/_edit_use_anchors_ = true
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-z_index = 201
-position = Vector2(637, 390)
-texture = ExtResource("4_b07f3")
 
 [node name="Node2D" type="Node2D" parent="."]
 z_index = -3

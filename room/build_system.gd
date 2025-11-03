@@ -88,7 +88,8 @@ func start_preview(item_data: ItemData) -> void:
 	preview.modulate = Color(1,1,1,0.5)
 	#preview.centered = true
 	add_child(preview)
-	preview.z_index = 10000
+	preview.z_index = 100
+	preview.z_as_relative = true
 	
 	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
 	
