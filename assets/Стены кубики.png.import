@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btfikjqll0lkd"
-path="res://.godot/imported/tilemap_64.png-c6bf4a681122957a398537098058a166.ctex"
+uid="uid://db66h0di0x2f1"
+path="res://.godot/imported/Стены кубики.png-241d33758a670df7581460cd5c10102c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tilemap_64.png"
-dest_files=["res://.godot/imported/tilemap_64.png-c6bf4a681122957a398537098058a166.ctex"]
+source_file="res://assets/Стены кубики.png"
+dest_files=["res://.godot/imported/Стены кубики.png-241d33758a670df7581460cd5c10102c.ctex"]
 
 [params]
 

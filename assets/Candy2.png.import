@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c2lr7cy5af4t5"
-path="res://.godot/imported/cubes_tilemap_32.png-e2d8d7d2606b69013b6386c5e95db288.ctex"
+uid="uid://6n71hlymd8km"
+path="res://.godot/imported/Candy2.png-8634d1c1cda4cf1bae2f31853676c3c8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/cubes_tilemap_32.png"
-dest_files=["res://.godot/imported/cubes_tilemap_32.png-e2d8d7d2606b69013b6386c5e95db288.ctex"]
+source_file="res://assets/Candy2.png"
+dest_files=["res://.godot/imported/Candy2.png-8634d1c1cda4cf1bae2f31853676c3c8.ctex"]
 
 [params]
 

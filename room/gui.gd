@@ -2,8 +2,8 @@ extends CanvasLayer
 
 @onready var placement: Node2D = $"../../BuildSystem"
 
-var InvSize = 4
-var itemsLoad = ["res://room/ItemsResources/OneCube.tres", "res://room/ItemsResources/MatchBox.tres", "res://room/ItemsResources/Box.tres", "res://room/ItemsResources/TwoCubes.tres"]
+var InvSize = 3
+var itemsLoad = ["res://room/ItemsResources/Spool.tres","res://room/ItemsResources/Candy.tres", "res://room/ItemsResources/MatchBox.tres"]
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	for i in InvSize:
@@ -29,11 +29,11 @@ func _create_exit_button() -> void:
 	exit_button.name = "ExitButton"
 	
 	# Position in top right corner using anchors
-	exit_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	exit_button.offset_left = -220
-	exit_button.offset_top = 20
-	exit_button.offset_right = -20
-	exit_button.offset_bottom = 60
+	exit_button.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	#exit_button.offset_left = -220
+	#exit_button.offset_top = 20
+	exit_button.offset_left = 5
+	exit_button.offset_top = 80
 	exit_button.custom_minimum_size = Vector2(200, 40)
 	
 	# Connect signal
