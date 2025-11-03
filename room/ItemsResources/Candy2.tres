@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bk0nrwrqql6cj"]
+
+[ext_resource type="Script" uid="uid://dp68rqgr7l423" path="res://room/ItemsResources/ItemData.gd" id="1_v1e1n"]
+[ext_resource type="Texture2D" uid="uid://7hddlwevsnn4" path="res://assets/Candy.png" id="2_v1e1n"]
+
+[resource]
+script = ExtResource("1_v1e1n")
+type = 4
+name = "Box"
+description = "This is box"
+texture = ExtResource("2_v1e1n")
+width = 320
+height = 200
+size = Vector2i(1, 4)
+pivot_offset = Vector2i(320, 320)

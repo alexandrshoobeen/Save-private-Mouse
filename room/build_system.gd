@@ -17,6 +17,14 @@ const ACTION_CANCEL := "ui_cancel"
 
 func _ready():
 	rebuild_placed_object()
+	set_cell_occupied(Vector2(10, 1), true)
+	set_cell_occupied(Vector2(9, 1), true)
+	set_cell_occupied(Vector2(10, 0), true)
+	set_cell_occupied(Vector2(9, 0), true)
+	
+func get_iso_z_index(pos: Vector2) -> int:
+	# Compute z_index
+	return pos.y
 	
 		
 func rebuild_placed_object() -> void:
@@ -31,6 +39,7 @@ func rebuild_placed_object() -> void:
 		item_data.width = obj_dict["width"]
 		item_data.height = obj_dict["height"]
 		item_data.description = obj_dict.get("description", "")
+		item_data.z_size = obj_dict["z_size"]
 	
 		var cell: Vector2i = obj_dict["cell"]
 		var area := Area2D.new()
@@ -44,7 +53,7 @@ func rebuild_placed_object() -> void:
 
 		var shape := CollisionShape2D.new()
 		var rect_shape := RectangleShape2D.new()
-		rect_shape.size = Vector2(obj_dict.width, obj_dict.height)
+		rect_shape.size = Vector2(obj_dict.width/2, obj_dict.height/2)
 		shape.shape = rect_shape
 		area.add_child(shape)
 
@@ -54,13 +63,17 @@ func rebuild_placed_object() -> void:
 
 		var iso_pos = _cell_to_iso(cell) + Vector2(obj_dict.width / 2, obj_dict.height / 2)
 		area.global_position = tilemap_layer.to_global(iso_pos)
-		obj.z_index = int(obj.global_position.y - obj_dict.height / 2)
+		#obj.z_index = int(obj.global_position.y - obj_dict.height / 2)
+		
+		var size = obj_dict.size
+		var c = get_check_cell(cell, size.x-1, size.y-1, size, obj_dict.z_size)
+		obj.z_index = get_iso_z_index(c)
 		
 				# ------------------- FIX -------------------
 		# Mark the cells occupied
 		for y in range(item_data.size.y):
 			for x in range(item_data.size.x):
-				var occupied_cell = get_check_cell(cell, x, y,item_data.size)
+				var occupied_cell = get_check_cell(cell, x, y,item_data.size, item_data.z_size)
 				set_cell_occupied(occupied_cell, true)
 		# ------------------- END FIX -------------------
 
@@ -106,16 +119,23 @@ func _process(_delta: float) -> void:
 	var iso_pos = _cell_to_iso(cell) + Vector2(current_item_data.width/2, current_item_data.height / 2)
 	
 		# ✅ If mouse over occupied cell(s), hide preview
-	if _is_over_occupied(cell):
-		preview.visible = false
-		return
-	else:
-		preview.visible = true
+	#if _is_over_occupied(cell):
+		#preview.visible = false
+		#return
+	#else:
+		#preview.visible = true
 	
 	print(cell, 'CELL')
 
 	preview.global_position = tilemap_layer.to_global(iso_pos)
-	preview.z_index = int(preview.global_position.y - current_item_data.height / 2)
+	#preview.z_index = int(preview.global_position.y - current_item_data.height / 2)
+	
+	var size = current_item_data.size
+
+	var c = get_check_cell(cell, size.x-1, size.y-1, size, current_item_data.z_size)
+	#preview.z_index = get_iso_z_index(c)
+	preview.z_index = 100000
+	
 
 	var can_place = _can_place(cell)
 	preview.modulate = Color(0,1,0,0.5) if can_place else Color(1,0,0,0.5)
@@ -133,8 +153,9 @@ func _can_place(cell: Vector2i) -> bool:
 	
 	for y in range(size.y):
 		for x in range(size.x):
-			var check_cell = get_check_cell(cell, x, y, size)
-			print(check_cell, "CHECK CELL")
+			var check_cell = get_check_cell(cell, x, y, size, current_item_data.z_size)
+			print(cell, 'CELL')
+			print(check_cell, 'CHECK_CELL')
 			
 			# ✅ Check if already occupied
 			if is_cell_occupied(check_cell):
@@ -171,11 +192,10 @@ func _place_object(cell: Vector2i) -> void:
 	obj.set_meta("cell", cell)
 	area.add_child(obj)
 
-	# ✅ Add collision shape for clicks
-	var shape := CollisionShape2D.new()
+	var shape := CollisionShape2D.new() 
 	var rect_shape := RectangleShape2D.new()
-	rect_shape.size = Vector2(current_item_data.width, current_item_data.height)
-	shape.shape = rect_shape
+	rect_shape.size = Vector2(current_item_data.width/2, current_item_data.height/2) 
+	shape.shape = rect_shape 
 	area.add_child(shape)
 
 	# ✅ Connect input signal on Area2D
@@ -190,13 +210,15 @@ func _place_object(cell: Vector2i) -> void:
 	area.global_position = tilemap_layer.to_global(iso_pos)
 
 	# ✅ Sprite z-index relative to Area2D
-	obj.z_index = int(obj.global_position.y - current_item_data.height / 2)
+	#obj.z_index = int(obj.global_position.y - current_item_data.height / 2)
+	var size = current_item_data.size
+	var c = get_check_cell(cell, size.x-1, size.y-1, size, current_item_data.z_size)
+	obj.z_index = get_iso_z_index(c)
 	
 		# ✅ Mark occupied cells
-	var size = current_item_data.size
 	for y in range(size.y):
 		for x in range(size.x):
-			var check_cell = get_check_cell(cell, x, y, size)
+			var check_cell = get_check_cell(cell, x, y, size, current_item_data.z_size)
 			var occupied = check_cell
 			set_cell_occupied(occupied, true)
 			
@@ -210,6 +232,7 @@ func _place_object(cell: Vector2i) -> void:
 		"texture_path": current_item_data.texture.resource_path,
 		"width": current_item_data.width,
 		"height": current_item_data.height,
+		"z_size": current_item_data.z_size,
 	})
 		
 # ------------------- Remove item from inventory by name -------------------
@@ -245,20 +268,16 @@ func _is_over_occupied(cell: Vector2i) -> bool:
 	var size = current_item_data.size
 	for y in range(size.y):
 		for x in range(size.x):
-			var check_cell = get_check_cell(cell, x, y, size)
+			var check_cell = get_check_cell(cell, x, y, size, current_item_data.z_size)
 			if is_cell_occupied(check_cell):
 				return true
 	return false
 	
 # ------------------- Helper: Get check cell position -------------------
-func get_check_cell(cell: Vector2i, x: int, y: int, size: Vector2i) -> Vector2i:
-	# Your previous offset rule:
-	# var offset = Vector2i(x + 1, y if size.y > 1 else y + 1)
-	# Return cell + offset
-	
+func get_check_cell(cell: Vector2i, x: int, y: int, size: Vector2i, z_size: int) -> Vector2i:
 	var offset_x = x + 1
 	var offset_y = y if size.y > 1 else y + 1
-	return cell + Vector2i(offset_x, offset_y)
+	return cell + Vector2i(offset_x+z_size, offset_y + z_size)
 
 # ------------------- Stop preview -------------------
 func _stop_preview() -> void:
@@ -287,6 +306,8 @@ func is_cell_occupied(cell: Vector2i) -> bool:
 	return occupied_cells.has(cell)
 	
 func _on_object_clicked(viewport: Node, event: InputEvent, shape_idx: int, area: Area2D) -> void:
+	if current_item_data:
+		return
 	if event is InputEventMouseButton and event.button_index == MouseButton.MOUSE_BUTTON_LEFT and event.pressed:
 		print("Picked up object:", area)
 
@@ -298,7 +319,7 @@ func _on_object_clicked(viewport: Node, event: InputEvent, shape_idx: int, area:
 		var size = item_data.size
 		for y in range(size.y):
 			for x in range(size.x):
-				var check_cell = get_check_cell(cell, x, y, size)
+				var check_cell = get_check_cell(cell, x, y, size, item_data.z_size)
 				set_cell_occupied(check_cell, false)
 				
 		# Remove from global placed objects

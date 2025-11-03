@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btfikjqll0lkd"
-path="res://.godot/imported/tilemap_64.png-c6bf4a681122957a398537098058a166.ctex"
+uid="uid://c1lm0j271f0qr"
+path="res://.godot/imported/Стена_правая.png-f7a4d098ce1f90d15b4cb9919a52a89f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tilemap_64.png"
-dest_files=["res://.godot/imported/tilemap_64.png-c6bf4a681122957a398537098058a166.ctex"]
+source_file="res://assets/Стена_правая.png"
+dest_files=["res://.godot/imported/Стена_правая.png-f7a4d098ce1f90d15b4cb9919a52a89f.ctex"]
 
 [params]
 
