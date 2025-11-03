@@ -3,7 +3,7 @@ extends CanvasLayer
 @onready var placement: Node2D = $"../../BuildSystem"
 
 var InvSize = 4
-var itemsLoad = ["res://room/ItemsResources/Bow.tres", "res://room/ItemsResources/Sword.tres"]
+var itemsLoad = ["res://room/ItemsResources/OneCube.tres", "res://room/ItemsResources/MatchBox.tres", "res://room/ItemsResources/Box.tres", "res://room/ItemsResources/TwoCubes.tres"]
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	for i in InvSize:
