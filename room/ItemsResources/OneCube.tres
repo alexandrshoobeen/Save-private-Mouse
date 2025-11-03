@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://cb0ccguuajuu4"]
+
+[ext_resource type="Script" uid="uid://dp68rqgr7l423" path="res://room/ItemsResources/ItemData.gd" id="1_4kalo"]
+[ext_resource type="Texture2D" uid="uid://dwf61afs7invi" path="res://assets/Untitled_Artwork 3 copy 2.png" id="2_ignaw"]
+
+[resource]
+script = ExtResource("1_4kalo")
+type = 4
+name = "Sword"
+description = "This is powerful sword"
+texture = ExtResource("2_ignaw")
+width = 187
+height = 187
+size = Vector2i(2, 1)

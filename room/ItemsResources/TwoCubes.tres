@@ -1,11 +1,13 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://c2jhnt82v34j4"]
 
 [ext_resource type="Script" uid="uid://dp68rqgr7l423" path="res://room/ItemsResources/ItemData.gd" id="1_5f4s3"]
-[ext_resource type="Texture2D" uid="uid://c31jqjlf380p0" path="res://assets/one_tile.png" id="2_k5ypy"]
+[ext_resource type="Texture2D" uid="uid://bh043hgfxxpho" path="res://assets/Untitled_Artwork 3 copy.png" id="2_c01wy"]
 
 [resource]
 script = ExtResource("1_5f4s3")
 type = 4
 name = "Bow"
 description = "This is powerful bow"
-texture = ExtResource("2_k5ypy")
+texture = ExtResource("2_c01wy")
+width = 128
+height = 128
