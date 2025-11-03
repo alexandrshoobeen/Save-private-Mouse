@@ -15,6 +15,7 @@ func _ready() -> void:
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	texture = data.texture
 	tooltip_text = "%s\n%s" % [data.name, data.description]
+	set_meta("item_name", data.name) 
 	
 #func _get_drag_data(at_position: Vector2) -> Variant:
 	##set_drag_preview(make_drag_preview(at_position))
