@@ -3,11 +3,13 @@ extends Node2D
 @onready var predator_awaking: Area2D = $PredatorAwaking
 @onready var get_up_area: Area2D = $"get up"
 @onready var jump_area: Area2D = $jump_area
+@onready var entering_room: Area2D = $entering_room
 @onready var predator_node: Node2D = $predator
 @onready var trash_node: Node2D = $Trash
 var hero_mouse: CharacterBody2D = null
 var predator_awakened: bool = false
 var is_jumping_to_trash: bool = false
+var dialog_window: Control = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -45,10 +47,19 @@ func _ready() -> void:
 	else:
 		print("[HOUSE] ERROR: jump_area is null!")
 	
+	# Set up "entering_room" area
+	if entering_room:
+		entering_room.monitoring = true
+		entering_room.monitorable = false
+		entering_room.body_entered.connect(_on_entering_room_body_entered)
+		print("[HOUSE] Entering room area set up and monitoring: ", entering_room.monitoring)
+	else:
+		print("[HOUSE] ERROR: entering_room is null!")
+	
 	# Create and add hero_mouse
 	var hero_mouse_scene = preload("res://heroMouse/hero_mouse.tscn")
 	hero_mouse = hero_mouse_scene.instantiate()
-	hero_mouse.position = Vector2(350.0, 550.0)
+	hero_mouse.position = Vector2(550.0, 550.0)
 	add_child(hero_mouse)
 	print("Hero mouse created: ", hero_mouse.name)
 
@@ -273,3 +284,142 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 		print("[HOUSE] ❌ ERROR: trash_node is null")
 	
 	is_jumping_to_trash = false
+
+
+func _on_entering_room_body_entered(body: Node) -> void:
+	print("[HOUSE] 🚪 Body entered entering_room: ", body.name, " | Path: ", body.get_path())
+	if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
+		print("[HOUSE] ✅ Hero mouse detected in entering_room! Showing dialog...")
+		if not dialog_window:
+			_show_enter_dialog()
+
+
+func _show_enter_dialog() -> void:
+	print("[HOUSE] Creating dialog window...")
+	
+	# Disable hero_mouse control and set idle_left animation
+	if hero_mouse:
+		if hero_mouse.has_method("disable_control"):
+			hero_mouse.disable_control()
+			print("[HOUSE] Hero mouse control disabled")
+		if hero_mouse.has_method("set_idle_left"):
+			hero_mouse.set_idle_left()
+			print("[HOUSE] Hero mouse animation set to idle_left")
+	
+	# Create main dialog container
+	dialog_window = Control.new()
+	dialog_window.name = "EnterDialog"
+	dialog_window.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dialog_window.mouse_filter = Control.MOUSE_FILTER_STOP
+	
+	# Create semi-transparent background
+	var background = ColorRect.new()
+	background.color = Color(0, 0, 0, 0.5)
+	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dialog_window.add_child(background)
+	
+	# Create dialog panel
+	var panel = Panel.new()
+	panel.name = "DialogPanel"
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(400, 200)
+	panel.position = Vector2(-200, -100)
+	dialog_window.add_child(panel)
+	
+	# Create VBoxContainer for layout
+	var vbox = VBoxContainer.new()
+	vbox.name = "VBoxContainer"
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 20)
+	panel.add_child(vbox)
+	
+	# Add margins
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_top", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	margin.add_theme_constant_override("margin_bottom", 20)
+	vbox.add_child(margin)
+	
+	var inner_vbox = VBoxContainer.new()
+	inner_vbox.add_theme_constant_override("separation", 15)
+	margin.add_child(inner_vbox)
+	
+	# Add label with question
+	var label = Label.new()
+	label.text = "Хотите войти в норку?"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 24)
+	inner_vbox.add_child(label)
+	
+	# Add buttons container
+	var buttons_container = HBoxContainer.new()
+	buttons_container.add_theme_constant_override("separation", 20)
+	buttons_container.alignment = BoxContainer.ALIGNMENT_CENTER
+	inner_vbox.add_child(buttons_container)
+	
+	# Add "Yes" button
+	var yes_button = Button.new()
+	yes_button.text = "Да"
+	yes_button.custom_minimum_size = Vector2(100, 40)
+	yes_button.pressed.connect(_on_dialog_yes)
+	buttons_container.add_child(yes_button)
+	
+	# Add "No" button
+	var no_button = Button.new()
+	no_button.text = "Нет"
+	no_button.custom_minimum_size = Vector2(100, 40)
+	no_button.pressed.connect(_on_dialog_no)
+	buttons_container.add_child(no_button)
+	
+	# Add dialog to scene tree
+	get_tree().root.add_child(dialog_window)
+	print("[HOUSE] ✅ Dialog window created")
+
+
+func _on_dialog_yes() -> void:
+	print("[HOUSE] ✅ User clicked 'Да' - loading blocks scene")
+	_close_dialog()
+	_load_blocks_scene()
+
+
+func _on_dialog_no() -> void:
+	print("[HOUSE] ❌ User clicked 'Нет' - reloading house scene")
+	_close_dialog()
+	_load_house_scene()
+
+
+func _close_dialog() -> void:
+	if dialog_window:
+		dialog_window.queue_free()
+		dialog_window = null
+		print("[HOUSE] Dialog window closed")
+	
+	# Note: Control will be enabled automatically when new scene loads
+	# But if we need to re-enable without scene change, we can do:
+	# if hero_mouse and hero_mouse.has_method("enable_control"):
+	# 	hero_mouse.enable_control()
+
+
+func _load_blocks_scene() -> void:
+	var blocks_scene_path = "res://room/blocks.tscn"
+	print("[HOUSE] Loading scene: ", blocks_scene_path)
+	
+	# Check if file exists
+	if ResourceLoader.exists(blocks_scene_path):
+		get_tree().change_scene_to_file(blocks_scene_path)
+		print("[HOUSE] ✅ Scene changed to blocks successfully")
+	else:
+		print("[HOUSE] ❌ ERROR: Scene file not found at path: ", blocks_scene_path)
+
+
+func _load_house_scene() -> void:
+	var house_scene_path = "res://house/house.tscn"
+	print("[HOUSE] Loading scene: ", house_scene_path)
+	
+	# Check if file exists
+	if ResourceLoader.exists(house_scene_path):
+		get_tree().change_scene_to_file(house_scene_path)
+		print("[HOUSE] ✅ Scene changed to house successfully")
+	else:
+		print("[HOUSE] ❌ ERROR: Scene file not found at path: ", house_scene_path)

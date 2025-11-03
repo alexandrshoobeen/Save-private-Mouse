@@ -4,6 +4,7 @@ extends CharacterBody2D
 @onready var state_machine: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @export var speed: float = 400.0
 var can_move_vertically: bool = false
+var can_control: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -13,6 +14,13 @@ func _ready() -> void:
 
 # Called every physics frame
 func _physics_process(_delta: float) -> void:
+	# Don't process input if control is disabled
+	if not can_control:
+		velocity.x = 0
+		velocity.y = 0
+		move_and_slide()
+		return
+	
 	var direction_x: float = 0.0
 	var direction_y: float = 0.0
 	
@@ -66,3 +74,23 @@ func enable_vertical_movement() -> void:
 func disable_vertical_movement() -> void:
 	can_move_vertically = false
 	print("[HERO_MOUSE] ❌ Vertical movement DISABLED - can_move_vertically = ", can_move_vertically)
+
+
+# Methods to enable/disable control
+func disable_control() -> void:
+	can_control = false
+	velocity.x = 0
+	velocity.y = 0
+	print("[HERO_MOUSE] ❌ Control DISABLED")
+
+
+func enable_control() -> void:
+	can_control = true
+	print("[HERO_MOUSE] ✅ Control ENABLED")
+
+
+# Method to set idle_left animation
+func set_idle_left() -> void:
+	if state_machine:
+		state_machine.travel("idle_left")
+		print("[HERO_MOUSE] Animation changed to idle_left")

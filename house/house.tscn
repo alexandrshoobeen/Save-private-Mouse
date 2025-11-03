@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cd1v6vfr5d5bg"]
+[gd_scene load_steps=14 format=3 uid="uid://cd1v6vfr5d5bg"]
 
 [ext_resource type="Script" uid="uid://wnyhb38yx81h" path="res://house/house.gd" id="1_wlv5f"]
 [ext_resource type="Texture2D" uid="uid://8jg5ijrrenhn" path="res://house/background.png" id="2_05tlr"]
@@ -18,6 +18,9 @@ size = Vector2(79, 481)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mkffg"]
 size = Vector2(65, 57.5)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jg0ij"]
+radius = 120.30378
 
 [node name="level" type="Node2D"]
 script = ExtResource("1_wlv5f")
@@ -80,3 +83,9 @@ texture = ExtResource("8_eev5h")
 
 [node name="threads" parent="." instance=ExtResource("8_ahhpa")]
 position = Vector2(4780, 46)
+
+[node name="entering_room" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="entering_room"]
+position = Vector2(302, 404)
+shape = SubResource("CircleShape2D_jg0ij")
