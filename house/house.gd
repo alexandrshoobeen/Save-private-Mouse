@@ -59,7 +59,7 @@ func _ready() -> void:
 	# Create and add hero_mouse
 	var hero_mouse_scene = preload("res://heroMouse/hero_mouse.tscn")
 	hero_mouse = hero_mouse_scene.instantiate()
-	hero_mouse.position = Vector2(550.0, 550.0)
+	hero_mouse.position = Vector2(550.0, 520.0)
 	add_child(hero_mouse)
 	print("Hero mouse created: ", hero_mouse.name)
 
