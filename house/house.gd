@@ -70,7 +70,7 @@ func _ready() -> void:
 	# Create and add hero_mouse
 	var hero_mouse_scene = preload("res://heroMouse/hero_mouse.tscn")
 	hero_mouse = hero_mouse_scene.instantiate()
-	hero_mouse.position = Vector2(550.0, 520.0)
+	hero_mouse.position = Vector2(550.0, 620.0)
 	hero_mouse.z_index = 2  # Ensure hero_mouse is above threads (1) and tumba (0)
 	add_child(hero_mouse)
 	print("Hero mouse created: ", hero_mouse.name)
@@ -159,37 +159,62 @@ func _process(_delta: float) -> void:
 	
 	# Manual check as backup (works even if signals don't trigger)
 	if hero_mouse and predator_awaking:
-		var zone_shape_node = predator_awaking.get_node("CollisionShape2D")
-		if zone_shape_node and zone_shape_node.shape is RectangleShape2D:
-			var rect_shape = zone_shape_node.shape as RectangleShape2D
-			# Get the global transform of the collision shape
-			var zone_transform = zone_shape_node.global_transform
-			var zone_pos = zone_transform.origin
-			var zone_size = rect_shape.size
-			
-			# Create rectangle centered at zone position
-			var zone_rect = Rect2(
-				zone_pos.x - zone_size.x / 2,
-				zone_pos.y - zone_size.y / 2,
-				zone_size.x,
-				zone_size.y
-			)
-			
-			# Check if hero_mouse position is in the zone
-			var mouse_pos = hero_mouse.global_position
-			var is_in_zone = zone_rect.has_point(mouse_pos)
-			
-			# Update predator state based on zone presence
-			if is_in_zone and not predator_awakened:
-				print("Manual check: hero_mouse at ", mouse_pos, " is in zone at ", zone_rect)
-				if predator_node and predator_node.has_method("wake_up"):
-					predator_node.wake_up()
-					predator_awakened = true
-			elif not is_in_zone and predator_awakened:
-				print("Manual check: hero_mouse left zone")
-				if predator_node and predator_node.has_method("fall_asleep"):
-					predator_node.fall_asleep()
-					predator_awakened = false
+		var is_in_zone = false
+		var mouse_pos = hero_mouse.global_position
+		
+		# Check all CollisionShape2D nodes in PredatorAwaking
+		for child in predator_awaking.get_children():
+			if child is CollisionShape2D and child.shape:
+				var shape = child.shape
+				var zone_transform = child.global_transform
+				var zone_pos = zone_transform.origin
+				
+				# Handle different shape types
+				if shape is RectangleShape2D:
+					var rect_shape = shape as RectangleShape2D
+					var zone_size = rect_shape.size
+					var zone_rect = Rect2(
+						zone_pos.x - zone_size.x / 2,
+						zone_pos.y - zone_size.y / 2,
+						zone_size.x,
+						zone_size.y
+					)
+					if zone_rect.has_point(mouse_pos):
+						is_in_zone = true
+						print("Manual check: hero_mouse at ", mouse_pos, " is in rectangle zone at ", zone_rect)
+						break
+				elif shape is CircleShape2D:
+					var circle_shape = shape as CircleShape2D
+					var radius = circle_shape.radius
+					var distance = mouse_pos.distance_to(zone_pos)
+					if distance <= radius:
+						is_in_zone = true
+						print("Manual check: hero_mouse at ", mouse_pos, " is in circle zone at ", zone_pos, " radius ", radius)
+						break
+				elif shape is CapsuleShape2D:
+					var capsule_shape = shape as CapsuleShape2D
+					# Simplified check for capsule - treat as circle
+					var radius = capsule_shape.radius
+					var distance = mouse_pos.distance_to(zone_pos)
+					if distance <= radius + capsule_shape.height / 2:
+						is_in_zone = true
+						print("Manual check: hero_mouse at ", mouse_pos, " is in capsule zone at ", zone_pos)
+						break
+		
+		# Update predator state based on zone presence
+		if is_in_zone and not predator_awakened:
+			if predator_node and predator_node.has_method("wake_up"):
+				predator_node.wake_up()
+				predator_awakened = true
+			# Start death animation for Camera2D
+			_start_camera_death_anim()
+		elif not is_in_zone and predator_awakened:
+			print("Manual check: hero_mouse left zone")
+			if predator_node and predator_node.has_method("fall_asleep"):
+				predator_node.fall_asleep()
+				predator_awakened = false
+			# Stop death animation for Camera2D
+			_stop_camera_death_anim()
 	
 	# Manual check for "get up" area (backup check)
 	if hero_mouse and get_up_area:
@@ -239,6 +264,9 @@ func _on_predator_awaking_body_entered(body: Node) -> void:
 					print("ERROR: predator_node doesn't have wake_up method")
 			else:
 				print("ERROR: predator_node is null")
+			
+			# Start death animation for Camera2D
+			_start_camera_death_anim()
 
 
 func _on_predator_awaking_body_exited(body: Node) -> void:
@@ -250,6 +278,9 @@ func _on_predator_awaking_body_exited(body: Node) -> void:
 			predator_node.fall_asleep()
 			predator_awakened = false
 			print("Predator fell asleep")
+		
+		# Stop death animation for Camera2D
+		_stop_camera_death_anim()
 
 
 func _on_predator_awaking_area_entered(area: Area2D) -> void:
@@ -258,6 +289,9 @@ func _on_predator_awaking_area_entered(area: Area2D) -> void:
 		if predator_node and predator_node.has_method("wake_up"):
 			predator_node.wake_up()
 			predator_awakened = true
+		
+		# Start death animation for Camera2D
+		_start_camera_death_anim()
 
 
 func _on_predator_awaking_area_exited(area: Area2D) -> void:
@@ -266,6 +300,9 @@ func _on_predator_awaking_area_exited(area: Area2D) -> void:
 		if predator_node and predator_node.has_method("fall_asleep"):
 			predator_node.fall_asleep()
 			predator_awakened = false
+		
+		# Stop death animation for Camera2D
+		_stop_camera_death_anim()
 
 
 func _on_get_up_area_body_entered(body: Node) -> void:
@@ -799,6 +836,32 @@ func _on_threads_area_exited_with_source(area: Area2D, threads_node_source: Node
 			_hide_pickup_label()
 			print("[HOUSE] ✅ Hero mouse area exited Threads")
 
+# Camera2D death animation functions
+func _start_camera_death_anim() -> void:
+	if hero_mouse:
+		var camera = hero_mouse.find_child("Camera2D", true, false)
+		if camera:
+			var animation_player = camera.find_child("AnimationPlayer", true, false)
+			if animation_player and animation_player.has_animation("death_anim"):
+				animation_player.play("death_anim")
+				print("[HOUSE] ✅ Camera2D death animation started")
+			else:
+				print("[HOUSE] ❌ Camera2D AnimationPlayer or death_anim not found")
+
+func _stop_camera_death_anim() -> void:
+	if hero_mouse:
+		var camera = hero_mouse.find_child("Camera2D", true, false)
+		if camera:
+			var animation_player = camera.find_child("AnimationPlayer", true, false)
+			if animation_player:
+				if animation_player.has_animation("RESET"):
+					animation_player.play("RESET")
+				else:
+					animation_player.stop()
+				print("[HOUSE] ✅ Camera2D death animation stopped")
+			else:
+				print("[HOUSE] ❌ Camera2D AnimationPlayer not found")
+
 
 func _pickup_matchbox() -> void:
 	if not is_near_matchbox or not current_matchbox or not matchbox_item_data:
@@ -809,6 +872,16 @@ func _pickup_matchbox() -> void:
 	# Add item to inventory
 	if house_gui and house_gui.has_method("add_item_to_inventory"):
 		if house_gui.add_item_to_inventory(matchbox_item_data):
+			# Add to Global.inventory_data
+			Global.inventory_data.append({
+				"name": matchbox_item_data.name,
+				"texture_path": matchbox_item_data.texture.resource_path if matchbox_item_data.texture else "",
+				"size": matchbox_item_data.size,
+				"description": matchbox_item_data.description
+			})
+			print("[HOUSE] ✅ MatchBox added to Global.inventory_data")
+			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
+			
 			# Remove MatchBox from scene
 			var matchbox_to_remove = current_matchbox
 			current_matchbox = null
@@ -831,6 +904,16 @@ func _pickup_threads() -> void:
 	# Add item to inventory
 	if house_gui and house_gui.has_method("add_item_to_inventory"):
 		if house_gui.add_item_to_inventory(threads_item_data):
+			# Add to Global.inventory_data
+			Global.inventory_data.append({
+				"name": threads_item_data.name,
+				"texture_path": threads_item_data.texture.resource_path if threads_item_data.texture else "",
+				"size": threads_item_data.size,
+				"description": threads_item_data.description
+			})
+			print("[HOUSE] ✅ Threads added to Global.inventory_data")
+			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
+			
 			# Find and remove threads from scene
 			var threads_to_remove = threads_node
 			if not threads_to_remove:

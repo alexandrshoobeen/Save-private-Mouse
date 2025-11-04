@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cg857j4qclu32"]
+[gd_scene load_steps=27 format=3 uid="uid://cg857j4qclu32"]
 
 [ext_resource type="Script" uid="uid://bdjaxccn7hw6m" path="res://heroMouse/hero_mouse.gd" id="1_5i1f4"]
 [ext_resource type="Texture2D" uid="uid://cr5oisqff60jo" path="res://heroMouse/мышбежитвверх1.png" id="2_hn2ls"]
@@ -23,14 +23,51 @@ func _process(delta: float) -> void:
 [sub_resource type="Gradient" id="Gradient_hn2ls"]
 interpolation_mode = 2
 offsets = PackedFloat32Array(0.5322129, 0.96358544)
-colors = PackedColorArray(1, 0.18039216, 0.10980392, 0, 0.72156864, 0, 0, 1)
+colors = PackedColorArray(1, 0.18039216, 0.10980392, 0, 0.2881593, 1.8349849e-07, 6.016344e-08, 1)
 metadata/_snap_count = 100
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_7wcx0"]
 gradient = SubResource("Gradient_hn2ls")
 fill = 1
 fill_from = Vector2(0.5, 0.5)
-fill_to = Vector2(1, 0.5)
+fill_to = Vector2(1, 0.7)
+
+[sub_resource type="Animation" id="Animation_xmbem"]
+resource_name = "death_anim"
+length = 5.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D3:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.18039216, 0.043137256, 0.23137255, 0.13333334, 0.40392157, 0.2, 0.5, 0.3, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_gcq4q"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D3:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lqv6p"]
+_data = {
+&"RESET": SubResource("Animation_gcq4q"),
+&"death_anim": SubResource("Animation_xmbem")
+}
 
 [sub_resource type="Animation" id="Animation_7wcx0"]
 length = 0.001
@@ -117,34 +154,6 @@ tracks/6/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [0.0]
-}
-
-[sub_resource type="Animation" id="Animation_xmbem"]
-resource_name = "deth_anim"
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera2D/Sprite2D3:modulate:a")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [0.0, 1.0]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Camera2D/Sprite2D3:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [true, true]
 }
 
 [sub_resource type="Animation" id="Animation_e5lrm"]
@@ -507,7 +516,6 @@ tracks/3/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xxnsd"]
 _data = {
 &"RESET": SubResource("Animation_7wcx0"),
-&"deth_anim": SubResource("Animation_xmbem"),
 &"falling_mouse": SubResource("Animation_e5lrm"),
 &"idle_left": SubResource("Animation_xxnsd"),
 &"idle_right": SubResource("Animation_wkr5k"),
@@ -577,10 +585,15 @@ position_smoothing_enabled = true
 script = SubResource("GDScript_mbcqr")
 
 [node name="Sprite2D3" type="Sprite2D" parent="Camera2D"]
-visible = false
 modulate = Color(1, 1, 1, 0)
-scale = Vector2(18.000002, 10.125)
+position = Vector2(22.999931, 5.500021)
+scale = Vector2(23.03125, 11.734375)
 texture = SubResource("GradientTexture2D_7wcx0")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Camera2D"]
+libraries = {
+&"": SubResource("AnimationLibrary_lqv6p")
+}
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

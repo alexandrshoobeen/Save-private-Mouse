@@ -3,22 +3,6 @@
 [ext_resource type="Script" uid="uid://cbiem60a6gks1" path="res://predator/predator.gd" id="1_1pxhk"]
 [ext_resource type="Texture2D" uid="uid://bx7skfdbebj7v" path="res://predator/котекилежат2.0.png" id="1_r4yy5"]
 
-[sub_resource type="Animation" id="Animation_r4yy5"]
-resource_name = "sleep"
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [1, 1]
-}
-
 [sub_resource type="Animation" id="Animation_1pxhk"]
 length = 0.001
 tracks/0/type = "value"
@@ -49,6 +33,22 @@ tracks/0/keys = {
 "values": [0, 0]
 }
 
+[sub_resource type="Animation" id="Animation_r4yy5"]
+resource_name = "sleep"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [1, 1]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_3p8ml"]
 _data = {
 &"RESET": SubResource("Animation_1pxhk"),
@@ -73,6 +73,7 @@ scale = Vector2(0.35, 0.35)
 script = ExtResource("1_1pxhk")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.9, 0.9)
 texture = ExtResource("1_r4yy5")
 hframes = 2
 frame = 1

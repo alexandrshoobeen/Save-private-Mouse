@@ -187,6 +187,17 @@ func _on_drop_dialog_yes() -> void:
 			# Create item on scene at drop position
 			_create_item_on_scene(item_to_drop.data, drop_position)
 		
+		# Remove item from Global.inventory_data
+		if item_to_drop.data:
+			var item_name = item_to_drop.data.name
+			print("[HOUSE_GUI] 📦 Global.inventory_data contents before drop: ", Global.inventory_data)
+			for i in range(Global.inventory_data.size() - 1, -1, -1):
+				if Global.inventory_data[i].has("name") and Global.inventory_data[i]["name"] == item_name:
+					Global.inventory_data.remove_at(i)
+					print("[HOUSE_GUI] Item '", item_name, "' removed from Global.inventory_data")
+					print("[HOUSE_GUI] 📦 Global.inventory_data contents after drop: ", Global.inventory_data)
+					break
+		
 		# Remove item from inventory
 		var slot = item_to_drop.get_parent()
 		if slot:
