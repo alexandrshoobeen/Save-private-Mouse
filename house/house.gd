@@ -272,6 +272,10 @@ func _ready() -> void:
 	# Check if current_inv_item is "candy" and add it to inventory automatically
 	if Global.current_inv_item == "candy" or Global.current_inv_item == "Candy":
 		_add_candy_to_inventory()
+	
+	# Restore trash state if falling animation was already completed
+	if Global.trash_falling_completed:
+		_restore_trash_falling_state()
 
 
 # CharacterBody2D will trigger body_entered signal, so we don't need manual position check
@@ -279,7 +283,7 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Handle E key press for pickup (single press)
 	if event is InputEventKey and event.pressed and event.keycode == KEY_E:
-		if is_near_throw_area and _has_candy_in_inventory() and not is_throwing_candy:
+		if is_near_throw_area and _has_candy_in_inventory() and _has_matchbox_and_threads_in_inventory() and not is_throwing_candy:
 			_throw_candy()
 		elif is_near_matchbox:
 			_pickup_matchbox()
@@ -399,14 +403,15 @@ func _process(_delta: float) -> void:
 		else:
 			screen_pos = viewport.get_screen_transform() * world_pos
 		
-		# Show appropriate label based on candy status
-		if has_candy:
+		# Show appropriate label based on candy status and required items
+		var has_matchbox_and_threads = _has_matchbox_and_threads_in_inventory()
+		if has_candy and has_matchbox_and_threads:
 			# Show throw candy label
 			if throw_candy_label:
 				throw_candy_label.position = screen_pos
 			if throw_warning_label:
 				throw_warning_label.visible = false
-			# Enable left movement if candy is available
+			# Enable left movement if candy and required items are available
 			if hero_mouse and hero_mouse.has_method("enable_left_movement"):
 				hero_mouse.enable_left_movement()
 		else:
@@ -707,16 +712,16 @@ func _on_throw_area_body_entered(body: Node) -> void:
 	var is_hero = (body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()) or body == hero_mouse)
 	if is_hero:
 		is_near_throw_area = true
-		# Check if candy is in inventory
-		if _has_candy_in_inventory():
-			print("[HOUSE] ✅ Hero mouse detected in throw_area with candy! Showing throw prompt...")
+		# Check if candy is in inventory and both MatchBox and Threads are present
+		if _has_candy_in_inventory() and _has_matchbox_and_threads_in_inventory():
+			print("[HOUSE] ✅ Hero mouse detected in throw_area with candy, MatchBox and Threads! Showing throw prompt...")
 			_hide_throw_warning_label()
 			_show_throw_candy_label()
 		else:
-			print("[HOUSE] ✅ Hero mouse detected in throw_area without candy! Showing warning...")
+			print("[HOUSE] ✅ Hero mouse detected in throw_area without required items! Showing warning...")
 			_hide_throw_candy_label()
 			_show_throw_warning_label()
-			# Disable left movement when entering throw_area without candy
+			# Disable left movement when entering throw_area without required items
 			if body.has_method("disable_left_movement"):
 				body.disable_left_movement()
 				print("[HOUSE] ✅ Left movement disabled for hero_mouse")
@@ -749,16 +754,16 @@ func _on_throw_area_area_entered(area: Area2D) -> void:
 	print("[HOUSE] 🎯 Area entered throw_area: ", area.get_path())
 	if "HeroMouse" in area.get_path().get_concatenated_names():
 		is_near_throw_area = true
-		# Check if candy is in inventory
-		if _has_candy_in_inventory():
-			print("[HOUSE] ✅ Hero mouse area detected in throw_area with candy! Showing throw prompt...")
+		# Check if candy is in inventory and both MatchBox and Threads are present
+		if _has_candy_in_inventory() and _has_matchbox_and_threads_in_inventory():
+			print("[HOUSE] ✅ Hero mouse area detected in throw_area with candy, MatchBox and Threads! Showing throw prompt...")
 			_hide_throw_warning_label()
 			_show_throw_candy_label()
 		else:
-			print("[HOUSE] ✅ Hero mouse area detected in throw_area without candy! Showing warning...")
+			print("[HOUSE] ✅ Hero mouse area detected in throw_area without required items! Showing warning...")
 			_hide_throw_candy_label()
 			_show_throw_warning_label()
-			# Disable left movement when entering throw_area without candy
+			# Disable left movement when entering throw_area without required items
 			if hero_mouse and hero_mouse.has_method("disable_left_movement"):
 				hero_mouse.disable_left_movement()
 				print("[HOUSE] ✅ Left movement disabled for hero_mouse")
@@ -896,6 +901,8 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 				print("[HOUSE] ✅ Falling animation started for trash (via AnimationTree)")
 				# Wait for animation to complete (0.5 seconds based on trash.tscn)
 				await get_tree().create_timer(0.5).timeout
+				# Mark falling animation as completed in Global
+				Global.trash_falling_completed = true
 				# Find MatchBox in scene (it might have been freed and recreated)
 				var active_matchbox = _get_matchbox_in_scene()
 				if active_matchbox:
@@ -960,6 +967,8 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 func _on_trash_falling_finished(anim_name: String) -> void:
 	if anim_name == "falling":
 		print("[HOUSE] ✅ Trash falling animation finished")
+		# Mark falling animation as completed in Global
+		Global.trash_falling_completed = true
 		# Find MatchBox in scene (it might have been freed and recreated)
 		var active_matchbox = _get_matchbox_in_scene()
 		if active_matchbox:
@@ -1010,6 +1019,31 @@ func _has_matchbox_in_inventory() -> bool:
 		if item.has("name") and item["name"] == "MatchBox":
 			return true
 	return false
+
+func _restore_trash_falling_state() -> void:
+	# Restore trash to falling completed state
+	if trash_node:
+		var sprite = trash_node.find_child("Sprite2D", true, false)
+		if sprite:
+			# Set sprite to last frame of falling animation (frame 2)
+			sprite.frame = 2
+			print("[HOUSE] ✅ Trash sprite restored to falling completed state (frame 2)")
+		
+		# Make MatchBox visible and enabled
+		var active_matchbox = _get_matchbox_in_scene()
+		if active_matchbox:
+			active_matchbox.visible = true
+			active_matchbox.monitoring = true
+			match_box = active_matchbox  # Update reference
+			print("[HOUSE] ✅ MatchBox restored to visible and enabled state")
+		else:
+			print("[HOUSE] ⚠️ MatchBox not found when restoring trash state")
+		
+		# Disable trash detected area
+		_disable_trash_detected_area()
+		print("[HOUSE] ✅ Trash falling state restored")
+	else:
+		print("[HOUSE] ❌ ERROR: trash_node is null when restoring state")
 
 func _disable_trash_detected_area() -> void:
 	if trash_detected_area:
@@ -1437,11 +1471,22 @@ func _hide_throw_candy_label() -> void:
 
 
 func _has_candy_in_inventory() -> bool:
-	# Check if candy is in Global.inventory_data
+	# Check if candy is in Global.current_inv_item
+	return Global.current_inv_item == "candy" or Global.current_inv_item == "Candy"
+
+func _has_matchbox_and_threads_in_inventory() -> bool:
+	# Check if both MatchBox and Threads are in Global.inventory_data
+	var has_matchbox = false
+	var has_threads = false
+	
 	for item in Global.inventory_data:
-		if item.has("name") and item["name"] == "Candy":
-			return true
-	return false
+		if item.has("name"):
+			if item["name"] == "MatchBox":
+				has_matchbox = true
+			elif item["name"] == "Threads":
+				has_threads = true
+	
+	return has_matchbox and has_threads
 
 func _add_candy_to_inventory() -> void:
 	# Check if candy is already in inventory
@@ -1465,7 +1510,10 @@ func _add_candy_to_inventory() -> void:
 				"size": candy_item_data.size,
 				"description": candy_item_data.description
 			})
+			# Set current_inv_item to Candy
+			Global.current_inv_item = "Candy"
 			print("[HOUSE] ✅ Candy added to Global.inventory_data")
+			print("[HOUSE] ✅ Global.current_inv_item set to: ", Global.current_inv_item)
 			print("[HOUSE] 📦 Global.inventory_data contents: ", Global.inventory_data)
 		else:
 			print("[HOUSE] ❌ Inventory is full! Only one item allowed.")
@@ -1970,7 +2018,7 @@ func _on_candy_area_exited_with_source(area: Area2D, _candy_area: Area2D) -> voi
 			print("[HOUSE] ✅ Hero mouse area exited Candy")
 
 func _throw_candy() -> void:
-	if is_throwing_candy or not _has_candy_in_inventory():
+	if is_throwing_candy or not _has_candy_in_inventory() or not _has_matchbox_and_threads_in_inventory():
 		return
 	
 	is_throwing_candy = true
@@ -2150,7 +2198,10 @@ func _pickup_candy() -> void:
 				"size": candy_item_data.size,
 				"description": candy_item_data.description
 			})
+			# Set current_inv_item to Candy
+			Global.current_inv_item = "Candy"
 			print("[HOUSE] ✅ Candy added to Global.inventory_data")
+			print("[HOUSE] ✅ Global.current_inv_item set to: ", Global.current_inv_item)
 			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
 			
 			# Remove Candy from scene

@@ -95,6 +95,7 @@ func add_item_to_inventory(item_data: ItemData) -> bool:
 	return false
 
 func _input(event: InputEvent) -> void:
+	# Disable right-click drop in house scene - items cannot be dropped
 	# Handle right-click on inventory item
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 		# Check if click is on inventory item
@@ -115,9 +116,14 @@ func _input(event: InputEvent) -> void:
 							# Item is inside slot, which is inside panel
 							var slot_rect = slot.get_global_rect()
 							if slot_rect.has_point(mouse_pos):
-								item_to_drop = item
-								_show_drop_dialog()
+								# Disable drop functionality in house scene
+								print("[HOUSE_GUI] ⚠️ Dropping items is disabled in house scene")
 								get_viewport().set_input_as_handled()
+								return
+								# Original code (disabled):
+								# item_to_drop = item
+								# _show_drop_dialog()
+								# get_viewport().set_input_as_handled()
 
 func _show_drop_dialog() -> void:
 	if drop_dialog:
