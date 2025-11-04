@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://ctbmvcdxiuwhh"]
+
+[ext_resource type="Texture2D" uid="uid://d322helxs1vaf" path="res://house/конфеточька.png" id="1_nsdal"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_op7bv"]
+radius = 21.820507
+height = 72.69357
+
+[node name="candy" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+rotation = 0.4886922
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_nsdal")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.0733775
+shape = SubResource("CapsuleShape2D_op7bv")

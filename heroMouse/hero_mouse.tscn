@@ -1,8 +1,10 @@
-[gd_scene load_steps=27 format=3 uid="uid://cg857j4qclu32"]
+[gd_scene load_steps=29 format=3 uid="uid://cg857j4qclu32"]
 
 [ext_resource type="Script" uid="uid://bdjaxccn7hw6m" path="res://heroMouse/hero_mouse.gd" id="1_5i1f4"]
 [ext_resource type="Texture2D" uid="uid://cr5oisqff60jo" path="res://heroMouse/мышбежитвверх1.png" id="2_hn2ls"]
-[ext_resource type="Texture2D" uid="uid://vtuvb5imqhxm" path="res://heroMouse/мышимыши2.0.png" id="2_mbcqr"]
+[ext_resource type="Texture2D" uid="uid://fvohqq1mr2fi" path="res://heroMouse/мышимыши3.0.png" id="3_7wcx0"]
+[ext_resource type="Texture2D" uid="uid://b5fvyfnobytfa" path="res://heroMouse/ням.png" id="4_7wcx0"]
+[ext_resource type="Texture2D" uid="uid://72oyccietq7h" path="res://heroMouse/blackscreen.png" id="4_xxnsd"]
 
 [sub_resource type="GDScript" id="GDScript_mbcqr"]
 script/source = "extends Camera2D
@@ -32,22 +34,6 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.7)
 
-[sub_resource type="Animation" id="Animation_xmbem"]
-resource_name = "death_anim"
-length = 5.0
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D3:modulate:a")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-"update": 0,
-"values": [0.0, 0.18039216, 0.043137256, 0.23137255, 0.13333334, 0.40392157, 0.2, 0.5, 0.3, 1.0]
-}
-
 [sub_resource type="Animation" id="Animation_gcq4q"]
 length = 0.001
 tracks/0/type = "value"
@@ -61,6 +47,94 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:scale:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1.3]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Sprite2D2:modulate:a")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_xmbem"]
+resource_name = "death_anim"
+length = 5.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D3:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.18039216, 0.043137256, 0.23137255, 0.13333334, 0.40392157, 0.2, 0.5, 0.3, 1.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 4.3333335, 5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:scale:y")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 4.3333335, 5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [1.3, 1.3, 0.6]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Sprite2D2:modulate:a")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 5.0666666, 5.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.0, 1.0]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_lqv6p"]
@@ -98,31 +172,31 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:position")
+tracks/2/path = NodePath("Sprite2D2:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
+"update": 1,
+"values": [0]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Sprite2D2:frame")
+tracks/3/path = NodePath("Sprite2D2:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [0]
+"values": [true]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Sprite2D2:visible")
+tracks/4/path = NodePath("Sprite2D:visible")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -134,22 +208,10 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Sprite2D:visible")
+tracks/5/path = NodePath("Sprite2D2:rotation")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Sprite2D2:rotation")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -162,34 +224,22 @@ length = 0.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:position")
+tracks/0/path = NodePath("Sprite2D2:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D2:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [false, false]
 }
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:visible")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
 "times": PackedFloat32Array(0, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
@@ -209,7 +259,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [1, 1]
+"values": [3, 3]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -262,7 +312,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.5),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [1, 1]
+"values": [3, 3]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -573,21 +623,35 @@ hframes = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.4, 0.4)
-texture = ExtResource("2_mbcqr")
+texture = ExtResource("3_7wcx0")
 hframes = 2
 vframes = 2
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(252, -193)
+position = Vector2(252, -140)
 process_callback = 0
 limit_enabled = false
 position_smoothing_enabled = true
 script = SubResource("GDScript_mbcqr")
 
+[node name="Sprite2D2" type="Sprite2D" parent="Camera2D"]
+modulate = Color(1, 1, 1, 0)
+z_index = 5
+position = Vector2(6.642938e-05, 1.7523766e-05)
+scale = Vector2(1.1383399, 1.2390058)
+texture = ExtResource("4_xxnsd")
+
+[node name="Sprite2D" type="Sprite2D" parent="Camera2D"]
+visible = false
+z_index = 4
+scale = Vector2(0.6, 1.3)
+texture = ExtResource("4_7wcx0")
+
 [node name="Sprite2D3" type="Sprite2D" parent="Camera2D"]
 modulate = Color(1, 1, 1, 0)
-position = Vector2(22.999931, 5.500021)
-scale = Vector2(23.03125, 11.734375)
+z_index = 3
+position = Vector2(8.500002, 1.9999719)
+scale = Vector2(22.890625, 10.59375)
 texture = SubResource("GradientTexture2D_7wcx0")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Camera2D"]

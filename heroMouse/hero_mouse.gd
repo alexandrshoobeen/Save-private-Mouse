@@ -4,6 +4,7 @@ extends CharacterBody2D
 @onready var state_machine: AnimationNodeStateMachinePlayback = animation_tree.get("parameters/playback")
 @export var speed: float = 400.0
 var can_move_vertically: bool = false
+var can_move_horizontally: bool = true  # Can move left/right by default
 var can_control: bool = true
 
 # Called when the node enters the scene tree for the first time.
@@ -24,11 +25,12 @@ func _physics_process(_delta: float) -> void:
 	var direction_x: float = 0.0
 	var direction_y: float = 0.0
 	
-	# Check for left/right input
-	if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
-		direction_x -= 1.0
-	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
-		direction_x += 1.0
+	# Check for left/right input (only if horizontal movement is allowed)
+	if can_move_horizontally:
+		if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
+			direction_x -= 1.0
+		if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
+			direction_x += 1.0
 	
 	# Check for up/down input (only when in "get up" area)
 	# Vertical movement animation has priority when enabled
@@ -78,16 +80,43 @@ func _physics_process(_delta: float) -> void:
 			state_machine.travel("idle_right")
 
 
-# Methods to enable/disable vertical movement
+# Methods to enable/disable movement in "get up" area (both vertical and horizontal)
 func enable_vertical_movement() -> void:
-	can_move_vertically = true
-	print("[HERO_MOUSE] ✅ Vertical movement ENABLED - can_move_vertically = ", can_move_vertically)
-	print("[HERO_MOUSE] Hero position: ", global_position)
+	# Only change if not already in this state
+	# In get up area, both horizontal and vertical movement should be enabled
+	if not can_move_vertically or not can_move_horizontally:
+		can_move_vertically = true
+		can_move_horizontally = true  # Enable horizontal movement in get up area too
+		print("[HERO_MOUSE] ✅ Vertical movement ENABLED - can_move_vertically = ", can_move_vertically)
+		print("[HERO_MOUSE] ✅ Horizontal movement ENABLED - can_move_horizontally = ", can_move_horizontally)
+		print("[HERO_MOUSE] Hero position: ", global_position)
 
 
 func disable_vertical_movement() -> void:
-	can_move_vertically = false
-	print("[HERO_MOUSE] ❌ Vertical movement DISABLED - can_move_vertically = ", can_move_vertically)
+	# Only change if not already in normal state (vertical=false, horizontal=true)
+	if can_move_vertically or not can_move_horizontally:
+		can_move_vertically = false
+		can_move_horizontally = true  # Re-enable horizontal movement when leaving get up area
+		print("[HERO_MOUSE] ✅ Normal horizontal movement restored - vertical: ", can_move_vertically, ", horizontal: ", can_move_horizontally)
+
+
+# Methods to enable movement in "getUp" area (both horizontal and vertical)
+func enable_horizontal_movement() -> void:
+	# Only change if not already in this state
+	# In getUp area, both horizontal and vertical movement should be enabled
+	if not can_move_horizontally or not can_move_vertically:
+		can_move_horizontally = true
+		can_move_vertically = true  # Enable vertical movement in getUp area
+		print("[HERO_MOUSE] ✅ Horizontal movement ENABLED - can_move_horizontally = ", can_move_horizontally)
+		print("[HERO_MOUSE] ✅ Vertical movement ENABLED - can_move_vertically = ", can_move_vertically)
+
+
+func disable_horizontal_movement() -> void:
+	# Only change if not already in normal state (both should be true)
+	if not can_move_horizontally or not can_move_vertically:
+		can_move_horizontally = true  # Re-enable horizontal movement
+		can_move_vertically = true    # Re-enable vertical movement (normal state)
+		print("[HERO_MOUSE] ✅ Normal movement restored - horizontal: ", can_move_horizontally, ", vertical: ", can_move_vertically)
 
 
 # Methods to enable/disable control

@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bekt4gqwxtbhs"]
+
+[ext_resource type="Texture2D" uid="uid://5omj68d34vmh" path="res://house/шкаф.png" id="1_uxmgs"]
+
+[node name="closet" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(165, 2)
+scale = Vector2(0.6, 0.65)
+texture = ExtResource("1_uxmgs")

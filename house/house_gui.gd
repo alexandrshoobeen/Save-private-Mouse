@@ -275,6 +275,8 @@ func _create_item_on_scene(item_data: ItemData, position: Vector2) -> void:
 		item_scene = preload("res://house/match_box.tscn")
 	elif item_data.name == "Threads":
 		item_scene = preload("res://house/threads.tscn")
+	elif item_data.name == "Candy":
+		item_scene = preload("res://house/candy.tscn")
 	else:
 		# Default to MatchBox
 		item_scene = preload("res://house/match_box.tscn")
@@ -285,7 +287,7 @@ func _create_item_on_scene(item_data: ItemData, position: Vector2) -> void:
 		
 		# Set z_index based on item type
 		# Threads should be above tumba (z_index 0) but below hero_mouse (z_index 2)
-		# MatchBox should be behind hero_mouse
+		# MatchBox and Candy should be behind hero_mouse
 		if item_data.name == "Threads":
 			# Set threads z_index to be between tumba (0) and hero_mouse (2)
 			item_node.z_index = 1  # Above tumba (0), below hero_mouse (2)
@@ -299,7 +301,7 @@ func _create_item_on_scene(item_data: ItemData, position: Vector2) -> void:
 					if child is Sprite2D:
 						child.z_index = 2  # Ensure sprites are also above threads
 		else:
-			item_node.z_index = -1  # Behind hero_mouse
+			item_node.z_index = -1  # Behind hero_mouse (MatchBox and Candy)
 		
 		# Also set z_index for Sprite2D inside item to ensure proper rendering order
 		var sprite = item_node.find_child("Sprite2D", true, false)
@@ -308,7 +310,7 @@ func _create_item_on_scene(item_data: ItemData, position: Vector2) -> void:
 				sprite.z_index = 1  # Above tumba (0) but below hero_mouse (2)
 				sprite.z_as_relative = false  # Use absolute z_index, not relative to parent
 			else:
-				sprite.z_index = -1  # Behind hero_mouse
+				sprite.z_index = -1  # Behind hero_mouse (MatchBox and Candy)
 		
 		# Add item to scene, but ensure proper z_index order
 		# Add threads before hero_mouse in tree to ensure correct rendering order
@@ -328,6 +330,8 @@ func _create_item_on_scene(item_data: ItemData, position: Vector2) -> void:
 		if item_data.name == "MatchBox" and item_node is Area2D:
 			item_node.monitoring = true
 			item_node.monitorable = true
+			# Set collision mask to detect hero_mouse on layer 1
+			item_node.collision_mask = 1  # Layer 1
 			
 			# Connect signals using lambda to pass the item reference
 			if house_scene.has_method("_on_matchbox_body_entered"):
@@ -339,12 +343,30 @@ func _create_item_on_scene(item_data: ItemData, position: Vector2) -> void:
 			if house_scene.has_method("_on_matchbox_area_exited"):
 				item_node.area_exited.connect(func(area): house_scene._on_matchbox_area_exited_with_source(area, item_node))
 		
+		elif item_data.name == "Candy" and item_node is Area2D:
+			item_node.monitoring = true
+			item_node.monitorable = true
+			# Set collision mask to detect hero_mouse on layer 1
+			item_node.collision_mask = 1  # Layer 1
+			
+			# Connect signals using lambda to pass the item reference
+			if house_scene.has_method("_on_candy_body_entered"):
+				item_node.body_entered.connect(func(body): house_scene._on_candy_body_entered_with_source(body, item_node))
+			if house_scene.has_method("_on_candy_body_exited"):
+				item_node.body_exited.connect(func(body): house_scene._on_candy_body_exited_with_source(body, item_node))
+			if house_scene.has_method("_on_candy_area_entered"):
+				item_node.area_entered.connect(func(area): house_scene._on_candy_area_entered_with_source(area, item_node))
+			if house_scene.has_method("_on_candy_area_exited"):
+				item_node.area_exited.connect(func(area): house_scene._on_candy_area_exited_with_source(area, item_node))
+		
 		elif item_data.name == "Threads" and item_node is Node2D:
 			# Threads is Node2D with PickupArea inside
 			var pickup_area = item_node.find_child("PickupArea", true, false)
 			if pickup_area and pickup_area is Area2D:
 				pickup_area.monitoring = true
 				pickup_area.monitorable = true
+				# Set collision mask to detect hero_mouse on layer 1
+				pickup_area.collision_mask = 1  # Layer 1
 				
 				# Connect signals for threads using lambda to pass item_node reference
 				if house_scene.has_method("_on_threads_body_entered"):
