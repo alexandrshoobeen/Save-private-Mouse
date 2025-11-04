@@ -2,7 +2,7 @@ extends Node
 
 
 # Inventory items: array of dictionaries {name, id, texture_path, size, description}
-var dinventory_data: Array = []
+var inventory_data: Array = []
 
 # Placed objects: array of dictionaries {item_name, item_id, cell, size, texture_path}
 var placed_objects: Array = []
