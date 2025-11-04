@@ -163,8 +163,8 @@ func _process(_delta: float) -> void:
 		_place_object(cell)
 		_stop_preview()
 
-	if Input.is_action_just_pressed(ACTION_CANCEL) or Input.is_mouse_button_pressed(MouseButton.MOUSE_BUTTON_RIGHT):
-		_stop_preview()
+	#if Input.is_action_just_pressed(ACTION_CANCEL) or Input.is_mouse_button_pressed(MouseButton.MOUSE_BUTTON_RIGHT):
+		#_stop_preview()
 
 # ------------------- Check placement -------------------	
 func _can_place(cell: Vector2i) -> bool:
