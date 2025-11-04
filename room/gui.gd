@@ -57,7 +57,7 @@ func _ready() -> void:
 						item.connect("gui_input", Callable(self, "_on_candy_click"))
 						#item.connect("mouse_entered", Callable(self, "_on_candy_hovered"))
 						#item.connect("mouse_exited", Callable(self, "_on_candy_unhovered"))
-
+	Global.current_inv_item =""
 	#for i in itemsLoad.size():
 		#var item = InventoryItem.new()
 		#item.init(load(itemsLoad[i]))

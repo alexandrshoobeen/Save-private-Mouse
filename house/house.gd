@@ -183,7 +183,10 @@ func _ready() -> void:
 	
 	# Set up MatchBox collision detection for initial MatchBox
 	if match_box:
-		match_box.monitoring = true
+		# Hide MatchBox initially - it should only become visible after trash falling animation
+		match_box.visible = false
+		# Disable monitoring initially - will be enabled after falling animation
+		match_box.monitoring = false
 		match_box.monitorable = true
 		# Set collision mask to detect hero_mouse on layer 1
 		match_box.collision_mask = 1  # Layer 1
@@ -191,7 +194,7 @@ func _ready() -> void:
 		match_box.body_exited.connect(_on_matchbox_body_exited)
 		match_box.area_entered.connect(_on_matchbox_area_entered)
 		match_box.area_exited.connect(_on_matchbox_area_exited)
-		print("[HOUSE] MatchBox collision detection set up")
+		print("[HOUSE] MatchBox collision detection set up (initially hidden and disabled)")
 	
 	# Also set up for any existing MatchBox in scene
 	_setup_all_matchboxes()
@@ -265,6 +268,10 @@ func _ready() -> void:
 	
 	# Create trash jump label (initially hidden)
 	_create_trash_jump_label()
+	
+	# Check if current_inv_item is "candy" and add it to inventory automatically
+	if Global.current_inv_item == "candy" or Global.current_inv_item == "Candy":
+		_add_candy_to_inventory()
 
 
 # CharacterBody2D will trigger body_entered signal, so we don't need manual position check
@@ -889,7 +896,15 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 				print("[HOUSE] ✅ Falling animation started for trash (via AnimationTree)")
 				# Wait for animation to complete (0.5 seconds based on trash.tscn)
 				await get_tree().create_timer(0.5).timeout
-				match_box.visible = true
+				# Find MatchBox in scene (it might have been freed and recreated)
+				var active_matchbox = _get_matchbox_in_scene()
+				if active_matchbox:
+					active_matchbox.visible = true
+					active_matchbox.monitoring = true
+					match_box = active_matchbox  # Update reference
+					print("[HOUSE] ✅ MatchBox made visible and enabled after falling animation")
+				else:
+					print("[HOUSE] ⚠️ MatchBox not found in scene after falling animation")
 				# Disable detected area after animation completes
 				_disable_trash_detected_area()
 			else:
@@ -945,7 +960,15 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 func _on_trash_falling_finished(anim_name: String) -> void:
 	if anim_name == "falling":
 		print("[HOUSE] ✅ Trash falling animation finished")
-		match_box.visible = true
+		# Find MatchBox in scene (it might have been freed and recreated)
+		var active_matchbox = _get_matchbox_in_scene()
+		if active_matchbox:
+			active_matchbox.visible = true
+			active_matchbox.monitoring = true
+			match_box = active_matchbox  # Update reference
+			print("[HOUSE] ✅ MatchBox made visible and enabled after falling animation")
+		else:
+			print("[HOUSE] ⚠️ MatchBox not found in scene after falling animation")
 		# Disable detected area after animation completes
 		_disable_trash_detected_area()
 		# Disconnect signal to avoid multiple calls
@@ -954,6 +977,39 @@ func _on_trash_falling_finished(anim_name: String) -> void:
 			if animation_player and animation_player.animation_finished.is_connected(_on_trash_falling_finished):
 				animation_player.animation_finished.disconnect(_on_trash_falling_finished)
 
+
+func _get_matchbox_in_scene() -> Area2D:
+	# First check if MatchBox is already in inventory - if so, don't show it
+	if _has_matchbox_in_inventory():
+		return null
+	
+	# First check if current match_box reference is valid
+	if match_box and is_instance_valid(match_box):
+		return match_box
+	
+	# Try to get from node path
+	var matchbox_node = get_node_or_null("MatchBox")
+	if matchbox_node and matchbox_node is Area2D:
+		return matchbox_node as Area2D
+	
+	# Search in children
+	for child in get_children():
+		if child is Area2D and child.name == "MatchBox":
+			return child
+	
+	# Try find_child as last resort
+	var found = find_child("MatchBox", true, false)
+	if found and found is Area2D:
+		return found as Area2D
+	
+	return null
+
+func _has_matchbox_in_inventory() -> bool:
+	# Check if MatchBox is in Global.inventory_data
+	for item in Global.inventory_data:
+		if item.has("name") and item["name"] == "MatchBox":
+			return true
+	return false
 
 func _disable_trash_detected_area() -> void:
 	if trash_detected_area:
@@ -1387,6 +1443,35 @@ func _has_candy_in_inventory() -> bool:
 			return true
 	return false
 
+func _add_candy_to_inventory() -> void:
+	# Check if candy is already in inventory
+	# if _has_candy_in_inventory():
+	# 	print("[HOUSE] ⚠️ Candy is already in inventory")
+	# 	return
+	
+	if not candy_item_data:
+		print("[HOUSE] ❌ ERROR: candy_item_data is null")
+		return
+	
+	print("[HOUSE] ✅ Adding Candy to inventory from Global.current_inv_item...")
+	
+	# Add item to inventory
+	if house_gui and house_gui.has_method("add_item_to_inventory"):
+		if house_gui.add_item_to_inventory(candy_item_data):
+			# Add to Global.inventory_data
+			Global.inventory_data.append({
+				"name": candy_item_data.name,
+				"texture_path": candy_item_data.texture.resource_path if candy_item_data.texture else "",
+				"size": candy_item_data.size,
+				"description": candy_item_data.description
+			})
+			print("[HOUSE] ✅ Candy added to Global.inventory_data")
+			print("[HOUSE] 📦 Global.inventory_data contents: ", Global.inventory_data)
+		else:
+			print("[HOUSE] ❌ Inventory is full! Only one item allowed.")
+	else:
+		print("[HOUSE] ❌ ERROR: house_gui or add_item_to_inventory method not found!")
+
 
 func _create_trash_jump_label() -> void:
 	# Create CanvasLayer for trash jump label
@@ -1433,7 +1518,10 @@ func _setup_all_matchboxes() -> void:
 	for child in get_children():
 		if child is Area2D and child.name == "MatchBox":
 			if not child.body_entered.is_connected(_on_matchbox_body_entered):
-				child.monitoring = true
+				# Hide MatchBox initially - it should only become visible after trash falling animation
+				child.visible = false
+				# Disable monitoring initially - will be enabled after falling animation
+				child.monitoring = false
 				child.monitorable = true
 				# Set collision mask to detect hero_mouse on layer 1
 				child.collision_mask = 1  # Layer 1
@@ -1441,7 +1529,7 @@ func _setup_all_matchboxes() -> void:
 				child.body_exited.connect(_on_matchbox_body_exited)
 				child.area_entered.connect(_on_matchbox_area_entered)
 				child.area_exited.connect(_on_matchbox_area_exited)
-				print("[HOUSE] MatchBox collision detection set up for: ", child.name)
+				print("[HOUSE] MatchBox collision detection set up for: ", child.name, " (initially hidden and disabled)")
 
 func _setup_all_candies() -> void:
 	# Set up collision detection for all candy instances in scene
