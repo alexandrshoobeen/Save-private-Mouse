@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://df03tmw72la84"]
 
 [ext_resource type="Script" uid="uid://cawy2cvg28noq" path="res://menu/menu.gd" id="1_sg6hu"]
-[ext_resource type="Texture2D" uid="uid://c7hxei5plajsk" path="res://final/обложка.png" id="2_g18jx"]
+[ext_resource type="Texture2D" uid="uid://dwi51wrlh1c6o" path="res://menu/обложка2.0 (2).png" id="2_g18jx"]
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -22,8 +22,6 @@ grow_vertical = 2
 color = Color(0.1, 0.1, 0.15, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="Background"]
-position = Vector2(189, 17)
-scale = Vector2(1.2, 1.2)
 texture = ExtResource("2_g18jx")
 centered = false
 
