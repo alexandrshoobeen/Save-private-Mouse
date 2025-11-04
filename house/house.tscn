@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://cd1v6vfr5d5bg"]
+[gd_scene load_steps=35 format=3 uid="uid://cd1v6vfr5d5bg"]
 
 [ext_resource type="Script" uid="uid://wnyhb38yx81h" path="res://house/house.gd" id="1_wlv5f"]
 [ext_resource type="Texture2D" uid="uid://8jg5ijrrenhn" path="res://house/background.png" id="2_05tlr"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://d15ipns2c352u" path="res://predator/predator.tscn" id="3_t6m4b"]
 [ext_resource type="PackedScene" uid="uid://bompm0cl2ylex" path="res://house/trash.tscn" id="4_nxes2"]
 [ext_resource type="PackedScene" uid="uid://whuxd6c0fo83" path="res://house/tumba.tscn" id="5_q8k63"]
+[ext_resource type="Texture2D" uid="uid://cuem1yrpldtmo" path="res://house/котекcидит.png" id="8_43e1r"]
 [ext_resource type="PackedScene" uid="uid://dil4c1lnq2n57" path="res://house/threads.tscn" id="8_ahhpa"]
 [ext_resource type="Texture2D" uid="uid://ceth7xue680rv" path="res://house/мильпопс.png" id="8_uxrrs"]
 [ext_resource type="Texture2D" uid="uid://dhktoqpp803v5" path="res://house/норка2.1.png" id="9_eev5h"]
@@ -14,6 +15,7 @@
 [ext_resource type="PackedScene" uid="uid://b5ivoskr6x0uv" path="res://house/match_box.tscn" id="12_uxrrs"]
 [ext_resource type="PackedScene" path="res://house/closet.tscn" id="13_gkkdt"]
 [ext_resource type="Texture2D" uid="uid://50ssbqa58mwy" path="res://house/window.png" id="14_7f618"]
+[ext_resource type="Texture2D" uid="uid://bkpku3ktp21o1" path="res://house/праваястена.png" id="14_c6gah"]
 [ext_resource type="Texture2D" uid="uid://dsu8qsit2wy52" path="res://house/picture.png" id="15_0ndow"]
 [ext_resource type="PackedScene" path="res://house/candy.tscn" id="16_hahy1"]
 
@@ -42,7 +44,7 @@ radius = 120.30378
 size = Vector2(38, 426)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c6gah"]
-size = Vector2(7119.75, 41)
+size = Vector2(7614.75, 41)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cu6ax"]
 size = Vector2(986, 20)
@@ -117,6 +119,12 @@ shape = SubResource("RectangleShape2D_t6m4b")
 position = Vector2(3641.5, 579)
 shape = SubResource("RectangleShape2D_uxrrs")
 
+[node name="Котекcидит" type="Sprite2D" parent="PredatorAwaking"]
+visible = false
+position = Vector2(4488, 414)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("8_43e1r")
+
 [node name="Мильпопс" type="Sprite2D" parent="PredatorAwaking"]
 position = Vector2(4399, 477.99997)
 rotation = 0.05235988
@@ -169,6 +177,11 @@ script = null
 [node name="closet" parent="." instance=ExtResource("13_gkkdt")]
 position = Vector2(2689, 349)
 
+[node name="Праваястена" type="Sprite2D" parent="."]
+position = Vector2(7194, 324)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("14_c6gah")
+
 [node name="Window" type="Sprite2D" parent="."]
 position = Vector2(6775, -400)
 scale = Vector2(0.6, 0.5)
@@ -185,11 +198,11 @@ texture = ExtResource("15_0ndow")
 [node name="collisions" type="Area2D" parent="."]
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="collisions"]
-position = Vector2(7173, 429)
+position = Vector2(7701, 419)
 shape = SubResource("RectangleShape2D_hahy1")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="collisions"]
-position = Vector2(3647.125, 620)
+position = Vector2(3894.625, 620)
 shape = SubResource("RectangleShape2D_c6gah")
 
 [node name="CollisionShape2D6" type="CollisionShape2D" parent="collisions"]

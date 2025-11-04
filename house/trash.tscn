@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bompm0cl2ylex"]
+[gd_scene load_steps=9 format=3 uid="uid://bompm0cl2ylex"]
 
 [ext_resource type="Texture2D" uid="uid://tp5n7erg0fop" path="res://house/ведёркоупало.png" id="1_30m5c"]
 
@@ -33,18 +33,39 @@ tracks/0/keys = {
 "values": [0, 1, 2]
 }
 
+[sub_resource type="Animation" id="Animation_nmf05"]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.033333335, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [2, 2]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_nmf05"]
 _data = {
 &"RESET": SubResource("Animation_rllnd"),
-&"falling": SubResource("Animation_30m5c")
+&"falling": SubResource("Animation_30m5c"),
+&"idle": SubResource("Animation_nmf05")
 }
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_30m5c"]
 animation = &"falling"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_rllnd"]
+animation = &"idle"
+
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_ch0tl"]
 states/falling/node = SubResource("AnimationNodeAnimation_30m5c")
 states/falling/position = Vector2(428, 111)
+states/idle/node = SubResource("AnimationNodeAnimation_rllnd")
+states/idle/position = Vector2(534, 102)
 
 [node name="Trash" type="Node2D"]
 

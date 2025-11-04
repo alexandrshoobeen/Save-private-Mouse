@@ -894,6 +894,8 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 		var animation_player = trash_node.get_node_or_null("AnimationPlayer")
 		
 		if animation_tree:
+			# Ensure AnimationTree is active
+			animation_tree.active = true
 			# Try to get state machine playback (it should exist automatically for state machines)
 			var state_machine = animation_tree.get("parameters/playback")
 			if state_machine:
@@ -903,6 +905,17 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 				await get_tree().create_timer(0.5).timeout
 				# Mark falling animation as completed in Global
 				Global.trash_falling_completed = true
+				# Switch to idle animation after falling - try state machine first
+				# Note: travel() returns void, so we can't check if state exists
+				# If state doesn't exist, it will print error but won't crash
+				state_machine.travel("idle")
+				print("[HOUSE] ✅ Trash animation switched to idle after falling via state machine (travel: idle)")
+				# Fallback to AnimationPlayer in case state machine doesn't have idle state
+				# (This will be handled by error message if state doesn't exist)
+				if animation_player:
+					# Also set AnimationPlayer to idle as backup
+					animation_player.play("idle")
+					print("[HOUSE] ✅ Also set AnimationPlayer to idle as backup")
 				# Find MatchBox in scene (it might have been freed and recreated)
 				var active_matchbox = _get_matchbox_in_scene()
 				if active_matchbox:
@@ -969,6 +982,33 @@ func _on_trash_falling_finished(anim_name: String) -> void:
 		print("[HOUSE] ✅ Trash falling animation finished")
 		# Mark falling animation as completed in Global
 		Global.trash_falling_completed = true
+		
+		# Switch to idle animation after falling - try state machine first
+		if trash_node:
+			var animation_tree = trash_node.get_node_or_null("AnimationTree")
+			var animation_player = trash_node.get_node_or_null("AnimationPlayer")
+			
+			if animation_tree:
+				animation_tree.active = true
+				var state_machine = animation_tree.get("parameters/playback")
+				if state_machine:
+					# Try to travel to idle state
+					# Note: travel() returns void, so we can't check if state exists
+					state_machine.travel("idle")
+					print("[HOUSE] ✅ Trash animation switched to idle after falling via state machine (travel: idle)")
+					# Also set AnimationPlayer to idle as backup
+					if animation_player:
+						animation_player.play("idle")
+						print("[HOUSE] ✅ Also set AnimationPlayer to idle as backup")
+				else:
+					# Fallback to AnimationPlayer if state machine not found
+					if animation_player:
+						animation_player.play("idle")
+						print("[HOUSE] ✅ Trash animation switched to idle after falling (via AnimationPlayer)")
+			elif animation_player:
+				animation_player.play("idle")
+				print("[HOUSE] ✅ Trash animation switched to idle after falling (via AnimationPlayer direct)")
+		
 		# Find MatchBox in scene (it might have been freed and recreated)
 		var active_matchbox = _get_matchbox_in_scene()
 		if active_matchbox:
@@ -1021,13 +1061,32 @@ func _has_matchbox_in_inventory() -> bool:
 	return false
 
 func _restore_trash_falling_state() -> void:
-	# Restore trash to falling completed state
+	# Restore trash to falling completed state and switch to idle animation
 	if trash_node:
-		var sprite = trash_node.find_child("Sprite2D", true, false)
-		if sprite:
-			# Set sprite to last frame of falling animation (frame 2)
-			sprite.frame = 2
-			print("[HOUSE] ✅ Trash sprite restored to falling completed state (frame 2)")
+		var animation_tree = trash_node.get_node_or_null("AnimationTree")
+		var animation_player = trash_node.get_node_or_null("AnimationPlayer")
+		
+		# Try to switch to idle animation using state machine first
+		if animation_tree:
+			animation_tree.active = true
+			var state_machine = animation_tree.get("parameters/playback")
+			if state_machine:
+				# Try to travel to idle state
+				# Note: travel() returns void, so we can't check if state exists
+				state_machine.travel("idle")
+				print("[HOUSE] ✅ Trash animation switched to idle via state machine (travel: idle)")
+				# Also set AnimationPlayer to idle as backup
+				if animation_player:
+					animation_player.play("idle")
+					print("[HOUSE] ✅ Also set AnimationPlayer to idle as backup")
+			else:
+				# Fallback to AnimationPlayer if state machine not found
+				if animation_player:
+					animation_player.play("idle")
+					print("[HOUSE] ✅ Trash animation switched to idle (via AnimationPlayer)")
+		elif animation_player:
+			animation_player.play("idle")
+			print("[HOUSE] ✅ Trash animation switched to idle (via AnimationPlayer direct)")
 		
 		# Make MatchBox visible and enabled
 		var active_matchbox = _get_matchbox_in_scene()
@@ -2129,6 +2188,15 @@ func _throw_candy() -> void:
 	if predator_node:
 		predator_node.visible = false
 		print("[HOUSE] ✅ Predator hidden after candy throw")
+	
+	# Show Котекcидит in PredatorAwaking after candy is thrown
+	if predator_awaking:
+		var котекcидит = predator_awaking.find_child("Котекcидит", true, false)
+		if котекcидит:
+			котекcидит.visible = true
+			print("[HOUSE] ✅ Котекcидит made visible after candy throw")
+		else:
+			print("[HOUSE] ⚠️ Котекcидит not found in PredatorAwaking")
 	
 	# Remove CollisionShape2D2 from PredatorAwaking
 	if predator_awaking:
