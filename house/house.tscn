@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://cd1v6vfr5d5bg"]
+[gd_scene load_steps=33 format=3 uid="uid://cd1v6vfr5d5bg"]
 
 [ext_resource type="Script" uid="uid://wnyhb38yx81h" path="res://house/house.gd" id="1_wlv5f"]
 [ext_resource type="Texture2D" uid="uid://8jg5ijrrenhn" path="res://house/background.png" id="2_05tlr"]
@@ -17,11 +17,14 @@
 [ext_resource type="Texture2D" uid="uid://dsu8qsit2wy52" path="res://house/picture.png" id="15_0ndow"]
 [ext_resource type="PackedScene" uid="uid://ctbmvcdxiuwhh" path="res://house/candy.tscn" id="16_hahy1"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_hahy1"]
+radius = 68.57129
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t6m4b"]
-size = Vector2(313, 97)
+size = Vector2(295.5, 97)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uxrrs"]
-size = Vector2(1202, 105)
+size = Vector2(1215, 105)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q8k63"]
 size = Vector2(96, 723)
@@ -53,6 +56,15 @@ size = Vector2(232.5, 491)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mpj70"]
 size = Vector2(419, 493)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ll3f3"]
+size = Vector2(58.5, 140)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0sddx"]
+size = Vector2(61, 114)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2oa6t"]
+size = Vector2(86.5, 97.5)
+
 [node name="level" type="Node2D"]
 script = ExtResource("1_wlv5f")
 
@@ -77,8 +89,15 @@ position = Vector2(5570, 200)
 scale = Vector2(1.6, 1.6000001)
 
 [node name="Trash" parent="." instance=ExtResource("4_nxes2")]
-position = Vector2(6252, 615)
+position = Vector2(6242, 559)
 scale = Vector2(0.7, 0.7)
+
+[node name="detected" type="Area2D" parent="Trash"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Trash/detected"]
+position = Vector2(27.142857, -44.285713)
+scale = Vector2(1, 0.7)
+shape = SubResource("CircleShape2D_hahy1")
 
 [node name="Подушечка" type="Sprite2D" parent="."]
 position = Vector2(3957, 289)
@@ -91,15 +110,15 @@ position = Vector2(3956.9998, 334)
 [node name="PredatorAwaking" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PredatorAwaking"]
-position = Vector2(4725, 581)
+position = Vector2(4733.75, 581)
 shape = SubResource("RectangleShape2D_t6m4b")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="PredatorAwaking"]
-position = Vector2(3635, 579)
+position = Vector2(3641.5, 579)
 shape = SubResource("RectangleShape2D_uxrrs")
 
 [node name="Мильпопс" type="Sprite2D" parent="PredatorAwaking"]
-position = Vector2(4352, 481.99997)
+position = Vector2(4399, 477.99997)
 rotation = 0.05235988
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("8_uxrrs")
@@ -118,7 +137,7 @@ shape = SubResource("RectangleShape2D_43e1r")
 position = Vector2(429, 21)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="jump_area"]
-position = Vector2(5715, -114)
+position = Vector2(5701, -116)
 shape = SubResource("RectangleShape2D_mkffg")
 
 [node name="Backgroundstart" type="Sprite2D" parent="."]
@@ -188,5 +207,19 @@ shape = SubResource("RectangleShape2D_61raq")
 position = Vector2(5514.5, 214.5)
 shape = SubResource("RectangleShape2D_mpj70")
 
+[node name="CollisionShape2D7" type="CollisionShape2D" parent="collisions"]
+position = Vector2(6140, -97)
+shape = SubResource("RectangleShape2D_ll3f3")
+
+[node name="CollisionShape2D8" type="CollisionShape2D" parent="collisions"]
+position = Vector2(4918, -99)
+shape = SubResource("RectangleShape2D_0sddx")
+
 [node name="candy" parent="." instance=ExtResource("16_hahy1")]
-position = Vector2(4207, 552)
+position = Vector2(4089, 544)
+
+[node name="throw_area" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="throw_area"]
+position = Vector2(4937, -90)
+shape = SubResource("RectangleShape2D_2oa6t")

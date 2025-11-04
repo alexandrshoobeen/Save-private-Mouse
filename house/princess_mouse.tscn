@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bctnfxkk1dj78"]
+
+[ext_resource type="Texture2D" uid="uid://b3jexw7a2xyhe" path="res://house/мышочька.png" id="1_tb1u8"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_u618e"]
+radius = 26.243572
+height = 76.892334
+
+[node name="PrincessMouse" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("1_tb1u8")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-4, 4)
+rotation = 1.2810717
+shape = SubResource("CapsuleShape2D_u618e")

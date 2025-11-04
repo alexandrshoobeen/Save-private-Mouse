@@ -5,6 +5,8 @@ extends CharacterBody2D
 @export var speed: float = 400.0
 var can_move_vertically: bool = false
 var can_move_horizontally: bool = true  # Can move left/right by default
+var can_move_right: bool = true  # Can move right by default
+var can_move_left: bool = true  # Can move left by default
 var can_control: bool = true
 
 # Called when the node enters the scene tree for the first time.
@@ -27,9 +29,9 @@ func _physics_process(_delta: float) -> void:
 	
 	# Check for left/right input (only if horizontal movement is allowed)
 	if can_move_horizontally:
-		if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
+		if can_move_left and (Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A)):
 			direction_x -= 1.0
-		if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
+		if can_move_right and (Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D)):
 			direction_x += 1.0
 	
 	# Check for up/down input (only when in "get up" area)
@@ -137,3 +139,32 @@ func set_idle_left() -> void:
 	if state_machine:
 		state_machine.travel("idle_left")
 		print("[HERO_MOUSE] Animation changed to idle_left")
+
+
+# Method to set idle_right animation
+func set_idle_right() -> void:
+	if state_machine:
+		state_machine.travel("idle_right")
+		print("[HERO_MOUSE] Animation changed to idle_right")
+
+
+# Methods to enable/disable right movement
+func disable_right_movement() -> void:
+	can_move_right = false
+	print("[HERO_MOUSE] ❌ Right movement DISABLED")
+
+
+func enable_right_movement() -> void:
+	can_move_right = true
+	print("[HERO_MOUSE] ✅ Right movement ENABLED")
+
+
+# Methods to enable/disable left movement
+func disable_left_movement() -> void:
+	can_move_left = false
+	print("[HERO_MOUSE] ❌ Left movement DISABLED")
+
+
+func enable_left_movement() -> void:
+	can_move_left = true
+	print("[HERO_MOUSE] ✅ Left movement ENABLED")
