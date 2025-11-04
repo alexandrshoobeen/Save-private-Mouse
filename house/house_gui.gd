@@ -11,15 +11,42 @@ func _ready() -> void:
 	_create_inventory_ui()
 
 func _create_inventory_ui() -> void:
-	# Create main inventory panel (left top)
-	var panel = Panel.new()
+	# Load inventory icon texture
+	var inventory_texture = load("res://house/инвентарь.png")
+	if not inventory_texture:
+		print("[HOUSE_GUI] ❌ ERROR: Could not load inventory texture!")
+		return
+	
+	# Get texture size to calculate proper scale
+	var texture_size = inventory_texture.get_size()
+	
+	# Create main inventory panel (left top) - keep as Control for proper layout
+	var panel = Control.new()
 	panel.name = "InventoryPanel"
 	panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
 	panel.offset_left = 20
 	panel.offset_top = 20
-	panel.offset_right = 94  # Width: 74 (1 slot * 64 + padding)
-	panel.offset_bottom = 94  # Height: 74 (1 slot * 64 + padding)
+	
+	# Calculate size to maintain aspect ratio
+	# Original panel size: 74x74 (94 - 20 = 74)
+	var target_size = 74
+	var scale_factor = min(target_size / texture_size.x, target_size / texture_size.y)
+	var scaled_size = texture_size * scale_factor
+	
+	panel.offset_right = 20 + scaled_size.x
+	panel.offset_bottom = 20 + scaled_size.y
+	panel.custom_minimum_size = scaled_size
 	add_child(panel)
+	
+	# Add TextureRect as background icon
+	var icon = TextureRect.new()
+	icon.name = "InventoryIcon"
+	icon.texture = inventory_texture
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE  # Don't block mouse events
+	panel.add_child(icon)
 	
 	# Create single slot container (no grid needed for 1 slot)
 	var container = Control.new()
