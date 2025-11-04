@@ -1,5 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bqufy5mdms48r"]
+[gd_scene load_steps=4 format=3 uid="uid://dil4c1lnq2n57"]
 
+[ext_resource type="Script" uid="uid://beekf6imp6mai" path="res://house/threads.gd" id="1_weo3u"]
 [ext_resource type="Texture2D" uid="uid://cg82ixkfapk6c" path="res://house/ниточки.png" id="1_ydx2q"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ydx2q"]
@@ -8,6 +9,7 @@ height = 94.0
 
 [node name="threads" type="Node2D"]
 rotation = 1.5707964
+script = ExtResource("1_weo3u")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.15, 0.15)

@@ -1,5 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://b5ivoskr6x0uv"]
+[gd_scene load_steps=4 format=3 uid="uid://b5ivoskr6x0uv"]
 
+[ext_resource type="Script" uid="uid://b7bcnsisb2e1i" path="res://house/match_box.gd" id="1_6yiel"]
 [ext_resource type="Texture2D" uid="uid://l67ehr7bgtdv" path="res://house/спички.png" id="1_sobua"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6yiel"]
@@ -7,6 +8,7 @@ radius = 29.0
 height = 104.0
 
 [node name="MatchBox" type="Area2D"]
+script = ExtResource("1_6yiel")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(2.555, -2.62)

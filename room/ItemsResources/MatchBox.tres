@@ -8,7 +8,7 @@
 script = ExtResource("1_tviyk")
 type = 4
 name = "MatchBox"
-description = "This is match box"
+description = "Получится отличный диван"
 texture = ExtResource("2_tviyk")
 width = 320
 height = 226
