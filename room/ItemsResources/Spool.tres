@@ -7,8 +7,8 @@
 [resource]
 script = ExtResource("1_o2nf0")
 type = 4
-name = "Spool"
-description = "This is box"
+name = "Threads"
+description = "Можно использовать вместо стола"
 texture = ExtResource("2_o2nf0")
 width = 128
 height = 210

@@ -19,6 +19,9 @@ const ACTION_CANCEL := "ui_cancel"
 
 func _ready():
 	rebuild_placed_object()
+	_set_candle_occupied_cells()
+	
+func _set_candle_occupied_cells() -> void:
 	set_cell_occupied(Vector2(10, 1), true)
 	set_cell_occupied(Vector2(9, 1), true)
 	set_cell_occupied(Vector2(10, 0), true)
@@ -244,6 +247,7 @@ func _place_object(cell: Vector2i) -> void:
 		
 # ------------------- Remove item from inventory by name -------------------
 func remove_item_from_inventory(item_name: String) -> void:
+	print(item_name, "REMOVE ITEM")
 	var item_to_remove: Node = null
 
 	# Iterate through all slots in %Inv
@@ -262,11 +266,11 @@ func remove_item_from_inventory(item_name: String) -> void:
 		item_to_remove.queue_free()
 		print("Removed placed item from inventory:", item_name)
 		
-			# Remove from global
-	for i in range(Global.inventory_data.size()):
-		if Global.inventory_data[i]["name"] == item_name:
-			Global.inventory_data.remove_at(i)
-			break
+			## Remove from global
+	#for i in range(Global.inventory_data.size()):
+		#if Global.inventory_data[i]["name"] == item_name:
+			#Global.inventory_data.remove_at(i)
+			#break
 
 # ------------------- Helper: Check if area overlaps occupied cells -------------------
 func _is_over_occupied(cell: Vector2i) -> bool:

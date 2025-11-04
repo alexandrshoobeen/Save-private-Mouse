@@ -14,7 +14,7 @@ func _ready() -> void:
 	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	texture = data.texture
-	tooltip_text = "%s\n%s" % [data.name, data.description]
+	tooltip_text = data.description
 	pivot_offset = data.pivot_offset
 	set_meta("item_name", data.name) 
 	
