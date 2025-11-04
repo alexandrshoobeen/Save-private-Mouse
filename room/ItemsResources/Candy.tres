@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://d0k8rqw3rfl5r"]
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3 uid="uid://d0k8rqw3rfl5r"]
 
 [ext_resource type="Script" uid="uid://dp68rqgr7l423" path="res://room/ItemsResources/ItemData.gd" id="1_kerh1"]
 [ext_resource type="Texture2D" uid="uid://6n71hlymd8km" path="res://assets/Candy2.png" id="2_irbpc"]
+[ext_resource type="AudioStream" uid="uid://b5jfdxmg4akml" path="res://sound/Candy.mp3" id="2_j7ke6"]
 
 [resource]
 script = ExtResource("1_kerh1")
@@ -12,3 +13,4 @@ texture = ExtResource("2_irbpc")
 width = 320
 height = 250
 size = Vector2i(4, 1)
+sound = ExtResource("2_j7ke6")
