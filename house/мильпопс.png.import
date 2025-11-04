@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8erpfcdeudky"
-path="res://.godot/imported/мышбежит3.png-3ba4f031ce6e5f6e97503deb0623bd6a.ctex"
+uid="uid://ceth7xue680rv"
+path="res://.godot/imported/мильпопс.png-e088441ca6a94253232769422199ba57.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://heroMouse/мышбежит3.png"
-dest_files=["res://.godot/imported/мышбежит3.png-3ba4f031ce6e5f6e97503deb0623bd6a.ctex"]
+source_file="res://house/мильпопс.png"
+dest_files=["res://.godot/imported/мильпопс.png-e088441ca6a94253232769422199ba57.ctex"]
 
 [params]
 

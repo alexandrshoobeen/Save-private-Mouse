@@ -1,9 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://dil4c1lnq2n57"]
+[gd_scene load_steps=3 format=3 uid="uid://bqufy5mdms48r"]
 
 [ext_resource type="Texture2D" uid="uid://cg82ixkfapk6c" path="res://house/ниточки.png" id="1_ydx2q"]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ydx2q"]
+radius = 21.0
+height = 94.0
+
 [node name="threads" type="Node2D"]
+rotation = 1.5707964
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("1_ydx2q")
+
+[node name="PickupArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+shape = SubResource("CapsuleShape2D_ydx2q")

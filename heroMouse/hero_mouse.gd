@@ -27,25 +27,35 @@ func _physics_process(_delta: float) -> void:
 	# Check for left/right input
 	if Input.is_action_pressed("ui_left") or Input.is_key_pressed(KEY_A):
 		direction_x -= 1.0
-		if state_machine:
-			state_machine.travel("walk_left")
 	if Input.is_action_pressed("ui_right") or Input.is_key_pressed(KEY_D):
 		direction_x += 1.0
-		if state_machine:
-			state_machine.travel("walk_right")
 	
 	# Check for up/down input (only when in "get up" area)
+	# Vertical movement animation has priority when enabled
 	if can_move_vertically:
 		if Input.is_action_pressed("ui_up") or Input.is_key_pressed(KEY_W):
 			direction_y -= 1.0
-			print("[HERO_MOUSE] Moving UP - direction_y: ", direction_y)
 		if Input.is_action_pressed("ui_down") or Input.is_key_pressed(KEY_S):
 			direction_y += 1.0
-			print("[HERO_MOUSE] Moving DOWN - direction_y: ", direction_y)
 	else:
 		# Debug: check if keys are pressed but vertical movement is disabled
 		if Input.is_action_pressed("ui_up") or Input.is_key_pressed(KEY_W) or Input.is_action_pressed("ui_down") or Input.is_key_pressed(KEY_S):
 			print("[HERO_MOUSE] DEBUG: Up/Down keys pressed but can_move_vertically = ", can_move_vertically)
+	
+	# Handle animation based on movement direction
+	# Vertical movement animation has priority when moving vertically
+	if can_move_vertically and direction_y != 0.0:
+		if state_machine:
+			if direction_y < 0.0:
+				state_machine.travel("walk_up")
+			else:
+				state_machine.travel("walk_down")
+	elif direction_x != 0.0:
+		if state_machine:
+			if direction_x < 0.0:
+				state_machine.travel("walk_left")
+			else:
+				state_machine.travel("walk_right")
 	
 	# Move the hero mouse using CharacterBody2D velocity
 	velocity.x = direction_x * speed
@@ -55,13 +65,17 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 	
 	# Handle idle states
-	if direction_x == 0.0 and state_machine:
+	if direction_x == 0.0 and direction_y == 0.0 and state_machine:
 		# Если шли вправо — стоим вправо. Если влево — стоим влево.
+		# Если шли вверх или вниз — возвращаемся к последнему горизонтальному состоянию
 		var current_node = state_machine.get_current_node()
 		if current_node == "walk_right":
 			state_machine.travel("idle_right")
 		elif current_node == "walk_left":
 			state_machine.travel("idle_left")
+		elif current_node == "walk_up" or current_node == "walk_down":
+			# При остановке вертикального движения возвращаемся к последнему горизонтальному idle
+			state_machine.travel("idle_right")
 
 
 # Methods to enable/disable vertical movement

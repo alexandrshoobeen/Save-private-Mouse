@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cf7s3mt22qiey"
-path="res://.godot/imported/мышбежит2.png-8e9481863a504aefbe6ee063f45a449e.ctex"
+uid="uid://cr5oisqff60jo"
+path="res://.godot/imported/мышбежитвверх1.png-2bfe4adcb3a9f33d716c865fcec48021.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://heroMouse/мышбежит2.png"
-dest_files=["res://.godot/imported/мышбежит2.png-8e9481863a504aefbe6ee063f45a449e.ctex"]
+source_file="res://heroMouse/мышбежитвверх1.png"
+dest_files=["res://.godot/imported/мышбежитвверх1.png-2bfe4adcb3a9f33d716c865fcec48021.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cthfy58gjw0a2"
-path="res://.godot/imported/backgroundstart.png-5192688c6fd75a18b3f385fc87ea01fa.ctex"
+uid="uid://tp5n7erg0fop"
+path="res://.godot/imported/ведёркоупало.png-8b8b72921aec7fb7a96171af6db0edfb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://house/backgroundstart.png"
-dest_files=["res://.godot/imported/backgroundstart.png-5192688c6fd75a18b3f385fc87ea01fa.ctex"]
+source_file="res://house/ведёркоупало.png"
+dest_files=["res://.godot/imported/ведёркоупало.png-8b8b72921aec7fb7a96171af6db0edfb.ctex"]
 
 [params]
 

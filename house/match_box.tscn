@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5ivoskr6x0uv"]
+
+[ext_resource type="Texture2D" uid="uid://l67ehr7bgtdv" path="res://house/спички.png" id="1_sobua"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6yiel"]
+radius = 29.0
+height = 104.0
+
+[node name="MatchBox" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(2.555, -2.62)
+rotation = 0.18325958
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_sobua")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_6yiel")

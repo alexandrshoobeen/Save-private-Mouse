@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d0t5ocep4ylg"
-path="res://.godot/imported/мышьбежит1.png-2e212603aa1298b69f8cb34b67b54fc8.ctex"
+uid="uid://pewylwechxaj"
+path="res://.godot/imported/илл2.png-02aadfbcc7e96c3cdcd7793779266299.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://heroMouse/мышьбежит1.png"
-dest_files=["res://.godot/imported/мышьбежит1.png-2e212603aa1298b69f8cb34b67b54fc8.ctex"]
+source_file="res://catscenes/илл2.png"
+dest_files=["res://.godot/imported/илл2.png-02aadfbcc7e96c3cdcd7793779266299.ctex"]
 
 [params]
 
