@@ -46,6 +46,7 @@ var death_anim_continuous_start_time: float = 0.0  # Time when current continuou
 var death_anim_animation_player: AnimationPlayer = null
 var death_anim_control_disabled: bool = false
 var death_anim_is_playing: bool = false  # Track if animation is currently playing
+var predator_texture_updated: bool = false  # Track if predator texture has been updated
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -1239,6 +1240,17 @@ func _close_dialog() -> void:
 
 
 func _load_blocks_scene() -> void:
+	# Check if princess_mouse is in inventory - if so, load final scene instead
+	if Global.current_inv_item == "princess_mouse" or Global.current_inv_item == "PrincessMouse":
+		var final_scene_path = "res://final/final.tscn"
+		print("[HOUSE] PrincessMouse in inventory - loading final scene instead of blocks")
+		if ResourceLoader.exists(final_scene_path):
+			get_tree().change_scene_to_file(final_scene_path)
+			print("[HOUSE] ✅ Scene changed to final successfully")
+		else:
+			print("[HOUSE] ❌ ERROR: Final scene file not found at path: ", final_scene_path)
+		return
+	
 	var blocks_scene_path = "res://room/blocks.tscn"
 	print("[HOUSE] Loading scene: ", blocks_scene_path)
 	
@@ -1545,7 +1557,30 @@ func _has_matchbox_and_threads_in_inventory() -> bool:
 			elif item["name"] == "Threads":
 				has_threads = true
 	
-	return has_matchbox and has_threads
+	var result = has_matchbox and has_threads
+	
+	# Update predator texture when condition is met (only once)
+	if result and not predator_texture_updated:
+		_update_predator_texture()
+		predator_texture_updated = true
+	
+	return result
+
+func _update_predator_texture() -> void:
+	# Update Sprite2D texture in predator to котмыш.png when MatchBox and Threads are in inventory
+	if predator_node:
+		var sprite = predator_node.find_child("Sprite2D", true, false)
+		if sprite and sprite is Sprite2D:
+			var new_texture = load("res://predator/котмыш.png")
+			if new_texture:
+				sprite.texture = new_texture
+				print("[HOUSE] ✅ Predator Sprite2D texture updated to котмыш.png")
+			else:
+				print("[HOUSE] ⚠️ Could not load texture: res://predator/котмыш.png")
+		else:
+			print("[HOUSE] ⚠️ Sprite2D not found in predator_node")
+	else:
+		print("[HOUSE] ⚠️ predator_node is null")
 
 func _add_candy_to_inventory() -> void:
 	# Check if candy is already in inventory
@@ -2413,7 +2448,10 @@ func _pickup_princess_mouse() -> void:
 				"size": princess_mouse_item_data.size,
 				"description": princess_mouse_item_data.description
 			})
+			# Set current_inv_item to PrincessMouse
+			Global.current_inv_item = "princess_mouse"
 			print("[HOUSE] ✅ PrincessMouse added to Global.inventory_data")
+			print("[HOUSE] ✅ Global.current_inv_item set to: ", Global.current_inv_item)
 			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
 			
 			# Remove PrincessMouse from scene

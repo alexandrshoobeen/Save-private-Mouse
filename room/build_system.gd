@@ -18,6 +18,17 @@ const ACTION_PLACE := "mouse_left"
 const ACTION_CANCEL := "ui_cancel"
 
 func _ready():
+	# Check if princess_mouse is in inventory - if so, load final scene instead
+	if Global.current_inv_item == "princess_mouse" or Global.current_inv_item == "PrincessMouse":
+		var final_scene_path = "res://final/final.tscn"
+		print("[BUILD_SYSTEM] PrincessMouse in inventory - loading final scene instead of blocks")
+		if ResourceLoader.exists(final_scene_path):
+			get_tree().change_scene_to_file(final_scene_path)
+			print("[BUILD_SYSTEM] ✅ Scene changed to final successfully")
+		else:
+			print("[BUILD_SYSTEM] ❌ ERROR: Final scene file not found at path: ", final_scene_path)
+		return
+	
 	rebuild_placed_object()
 	_set_candle_occupied_cells()
 	

@@ -15,8 +15,8 @@
 [ext_resource type="PackedScene" uid="uid://b5ivoskr6x0uv" path="res://house/match_box.tscn" id="12_uxrrs"]
 [ext_resource type="PackedScene" path="res://house/closet.tscn" id="13_gkkdt"]
 [ext_resource type="Texture2D" uid="uid://50ssbqa58mwy" path="res://house/window.png" id="14_7f618"]
-[ext_resource type="Texture2D" uid="uid://bkpku3ktp21o1" path="res://house/праваястена.png" id="14_c6gah"]
 [ext_resource type="Texture2D" uid="uid://dsu8qsit2wy52" path="res://house/picture.png" id="15_0ndow"]
+[ext_resource type="Texture2D" uid="uid://dgs47baldx0lr" path="res://house/праваястена2.2.png" id="15_43e1r"]
 [ext_resource type="PackedScene" path="res://house/candy.tscn" id="16_hahy1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hahy1"]
@@ -26,7 +26,7 @@ radius = 68.57129
 size = Vector2(295.5, 97)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uxrrs"]
-size = Vector2(1215, 105)
+size = Vector2(1091, 105)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q8k63"]
 size = Vector2(96, 723)
@@ -44,7 +44,7 @@ radius = 120.30378
 size = Vector2(38, 426)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c6gah"]
-size = Vector2(7614.75, 41)
+size = Vector2(7209.75, 41)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cu6ax"]
 size = Vector2(986, 20)
@@ -116,7 +116,7 @@ position = Vector2(4733.75, 581)
 shape = SubResource("RectangleShape2D_t6m4b")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="PredatorAwaking"]
-position = Vector2(3641.5, 579)
+position = Vector2(3680.5, 579)
 shape = SubResource("RectangleShape2D_uxrrs")
 
 [node name="Котекcидит" type="Sprite2D" parent="PredatorAwaking"]
@@ -178,9 +178,9 @@ script = null
 position = Vector2(2689, 349)
 
 [node name="Праваястена" type="Sprite2D" parent="."]
-position = Vector2(7194, 324)
+position = Vector2(7394, 324)
 scale = Vector2(0.8, 0.8)
-texture = ExtResource("14_c6gah")
+texture = ExtResource("15_43e1r")
 
 [node name="Window" type="Sprite2D" parent="."]
 position = Vector2(6775, -400)
@@ -198,11 +198,11 @@ texture = ExtResource("15_0ndow")
 [node name="collisions" type="Area2D" parent="."]
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="collisions"]
-position = Vector2(7701, 419)
+position = Vector2(7311, 384)
 shape = SubResource("RectangleShape2D_hahy1")
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="collisions"]
-position = Vector2(3894.625, 620)
+position = Vector2(3692.125, 620)
 shape = SubResource("RectangleShape2D_c6gah")
 
 [node name="CollisionShape2D6" type="CollisionShape2D" parent="collisions"]
