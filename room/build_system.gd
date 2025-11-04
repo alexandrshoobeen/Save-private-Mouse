@@ -4,6 +4,8 @@ extends Node2D
 @export var tile_width: int = 128
 @export var tile_height: int = 74
 
+var pickup_sound = preload("res://sound/My-Song-5.mp3")
+
 var preview: Sprite2D = null
 var current_item_data: ItemData = null
 
@@ -40,6 +42,7 @@ func rebuild_placed_object() -> void:
 		item_data.height = obj_dict["height"]
 		item_data.description = obj_dict.get("description", "")
 		item_data.z_size = obj_dict["z_size"]
+		item_data.sound = obj_dict["sound"]
 	
 		var cell: Vector2i = obj_dict["cell"]
 		var area := Area2D.new()
@@ -80,6 +83,7 @@ func rebuild_placed_object() -> void:
 # ------------------- Drag start -------------------
 func start_preview(item_data: ItemData) -> void:
 	print('StartPreview');
+	play_sound(pickup_sound)
 	current_item_data = item_data
 	if preview:
 		preview.queue_free()
@@ -185,6 +189,7 @@ func _place_object(cell: Vector2i) -> void:
 	# ✅ Create the Area2D as the parent
 	var area := Area2D.new()
 	add_child(area)
+	play_sound(current_item_data.sound)
 
 	# ✅ Create the sprite as a child
 	var obj := Sprite2D.new()
@@ -234,6 +239,7 @@ func _place_object(cell: Vector2i) -> void:
 		"width": current_item_data.width,
 		"height": current_item_data.height,
 		"z_size": current_item_data.z_size,
+		"sound": current_item_data.sound
 	})
 		
 # ------------------- Remove item from inventory by name -------------------
@@ -340,3 +346,12 @@ func _on_object_hover_enter(area: Area2D) -> void:
 
 func _on_object_hover_exit(area: Area2D) -> void:
 	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+		
+func play_sound(sound: AudioStream):
+	if sound:
+		var player = AudioStreamPlayer.new()
+		player.stream = sound
+		player.volume_db = -10
+		get_tree().current_scene.add_child(player)
+		player.play()
+		player.connect("finished", player.queue_free)
