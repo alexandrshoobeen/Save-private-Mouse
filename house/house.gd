@@ -46,6 +46,7 @@ var death_anim_continuous_start_time: float = 0.0  # Time when current continuou
 var death_anim_animation_player: AnimationPlayer = null
 var death_anim_control_disabled: bool = false
 var death_anim_is_playing: bool = false  # Track if animation is currently playing
+var predator_texture_updated: bool = false  # Track if predator texture has been updated
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -183,7 +184,10 @@ func _ready() -> void:
 	
 	# Set up MatchBox collision detection for initial MatchBox
 	if match_box:
-		match_box.monitoring = true
+		# Hide MatchBox initially - it should only become visible after trash falling animation
+		match_box.visible = false
+		# Disable monitoring initially - will be enabled after falling animation
+		match_box.monitoring = false
 		match_box.monitorable = true
 		# Set collision mask to detect hero_mouse on layer 1
 		match_box.collision_mask = 1  # Layer 1
@@ -191,7 +195,7 @@ func _ready() -> void:
 		match_box.body_exited.connect(_on_matchbox_body_exited)
 		match_box.area_entered.connect(_on_matchbox_area_entered)
 		match_box.area_exited.connect(_on_matchbox_area_exited)
-		print("[HOUSE] MatchBox collision detection set up")
+		print("[HOUSE] MatchBox collision detection set up (initially hidden and disabled)")
 	
 	# Also set up for any existing MatchBox in scene
 	_setup_all_matchboxes()
@@ -265,6 +269,14 @@ func _ready() -> void:
 	
 	# Create trash jump label (initially hidden)
 	_create_trash_jump_label()
+	
+	# Check if current_inv_item is "candy" and add it to inventory automatically
+	if Global.current_inv_item == "candy" or Global.current_inv_item == "Candy":
+		_add_candy_to_inventory()
+	
+	# Restore trash state if falling animation was already completed
+	if Global.trash_falling_completed:
+		_restore_trash_falling_state()
 
 
 # CharacterBody2D will trigger body_entered signal, so we don't need manual position check
@@ -272,7 +284,7 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Handle E key press for pickup (single press)
 	if event is InputEventKey and event.pressed and event.keycode == KEY_E:
-		if is_near_throw_area and _has_candy_in_inventory() and not is_throwing_candy:
+		if is_near_throw_area and _has_candy_in_inventory() and _has_matchbox_and_threads_in_inventory() and not is_throwing_candy:
 			_throw_candy()
 		elif is_near_matchbox:
 			_pickup_matchbox()
@@ -392,14 +404,15 @@ func _process(_delta: float) -> void:
 		else:
 			screen_pos = viewport.get_screen_transform() * world_pos
 		
-		# Show appropriate label based on candy status
-		if has_candy:
+		# Show appropriate label based on candy status and required items
+		var has_matchbox_and_threads = _has_matchbox_and_threads_in_inventory()
+		if has_candy and has_matchbox_and_threads:
 			# Show throw candy label
 			if throw_candy_label:
 				throw_candy_label.position = screen_pos
 			if throw_warning_label:
 				throw_warning_label.visible = false
-			# Enable left movement if candy is available
+			# Enable left movement if candy and required items are available
 			if hero_mouse and hero_mouse.has_method("enable_left_movement"):
 				hero_mouse.enable_left_movement()
 		else:
@@ -700,16 +713,16 @@ func _on_throw_area_body_entered(body: Node) -> void:
 	var is_hero = (body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()) or body == hero_mouse)
 	if is_hero:
 		is_near_throw_area = true
-		# Check if candy is in inventory
-		if _has_candy_in_inventory():
-			print("[HOUSE] ✅ Hero mouse detected in throw_area with candy! Showing throw prompt...")
+		# Check if candy is in inventory and both MatchBox and Threads are present
+		if _has_candy_in_inventory() and _has_matchbox_and_threads_in_inventory():
+			print("[HOUSE] ✅ Hero mouse detected in throw_area with candy, MatchBox and Threads! Showing throw prompt...")
 			_hide_throw_warning_label()
 			_show_throw_candy_label()
 		else:
-			print("[HOUSE] ✅ Hero mouse detected in throw_area without candy! Showing warning...")
+			print("[HOUSE] ✅ Hero mouse detected in throw_area without required items! Showing warning...")
 			_hide_throw_candy_label()
 			_show_throw_warning_label()
-			# Disable left movement when entering throw_area without candy
+			# Disable left movement when entering throw_area without required items
 			if body.has_method("disable_left_movement"):
 				body.disable_left_movement()
 				print("[HOUSE] ✅ Left movement disabled for hero_mouse")
@@ -742,16 +755,16 @@ func _on_throw_area_area_entered(area: Area2D) -> void:
 	print("[HOUSE] 🎯 Area entered throw_area: ", area.get_path())
 	if "HeroMouse" in area.get_path().get_concatenated_names():
 		is_near_throw_area = true
-		# Check if candy is in inventory
-		if _has_candy_in_inventory():
-			print("[HOUSE] ✅ Hero mouse area detected in throw_area with candy! Showing throw prompt...")
+		# Check if candy is in inventory and both MatchBox and Threads are present
+		if _has_candy_in_inventory() and _has_matchbox_and_threads_in_inventory():
+			print("[HOUSE] ✅ Hero mouse area detected in throw_area with candy, MatchBox and Threads! Showing throw prompt...")
 			_hide_throw_warning_label()
 			_show_throw_candy_label()
 		else:
-			print("[HOUSE] ✅ Hero mouse area detected in throw_area without candy! Showing warning...")
+			print("[HOUSE] ✅ Hero mouse area detected in throw_area without required items! Showing warning...")
 			_hide_throw_candy_label()
 			_show_throw_warning_label()
-			# Disable left movement when entering throw_area without candy
+			# Disable left movement when entering throw_area without required items
 			if hero_mouse and hero_mouse.has_method("disable_left_movement"):
 				hero_mouse.disable_left_movement()
 				print("[HOUSE] ✅ Left movement disabled for hero_mouse")
@@ -882,6 +895,8 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 		var animation_player = trash_node.get_node_or_null("AnimationPlayer")
 		
 		if animation_tree:
+			# Ensure AnimationTree is active
+			animation_tree.active = true
 			# Try to get state machine playback (it should exist automatically for state machines)
 			var state_machine = animation_tree.get("parameters/playback")
 			if state_machine:
@@ -889,7 +904,28 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 				print("[HOUSE] ✅ Falling animation started for trash (via AnimationTree)")
 				# Wait for animation to complete (0.5 seconds based on trash.tscn)
 				await get_tree().create_timer(0.5).timeout
-				match_box.visible = true
+				# Mark falling animation as completed in Global
+				Global.trash_falling_completed = true
+				# Switch to idle animation after falling - try state machine first
+				# Note: travel() returns void, so we can't check if state exists
+				# If state doesn't exist, it will print error but won't crash
+				state_machine.travel("idle")
+				print("[HOUSE] ✅ Trash animation switched to idle after falling via state machine (travel: idle)")
+				# Fallback to AnimationPlayer in case state machine doesn't have idle state
+				# (This will be handled by error message if state doesn't exist)
+				if animation_player:
+					# Also set AnimationPlayer to idle as backup
+					animation_player.play("idle")
+					print("[HOUSE] ✅ Also set AnimationPlayer to idle as backup")
+				# Find MatchBox in scene (it might have been freed and recreated)
+				var active_matchbox = _get_matchbox_in_scene()
+				if active_matchbox:
+					active_matchbox.visible = true
+					active_matchbox.monitoring = true
+					match_box = active_matchbox  # Update reference
+					print("[HOUSE] ✅ MatchBox made visible and enabled after falling animation")
+				else:
+					print("[HOUSE] ⚠️ MatchBox not found in scene after falling animation")
 				# Disable detected area after animation completes
 				_disable_trash_detected_area()
 			else:
@@ -945,7 +981,44 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 func _on_trash_falling_finished(anim_name: String) -> void:
 	if anim_name == "falling":
 		print("[HOUSE] ✅ Trash falling animation finished")
-		match_box.visible = true
+		# Mark falling animation as completed in Global
+		Global.trash_falling_completed = true
+		
+		# Switch to idle animation after falling - try state machine first
+		if trash_node:
+			var animation_tree = trash_node.get_node_or_null("AnimationTree")
+			var animation_player = trash_node.get_node_or_null("AnimationPlayer")
+			
+			if animation_tree:
+				animation_tree.active = true
+				var state_machine = animation_tree.get("parameters/playback")
+				if state_machine:
+					# Try to travel to idle state
+					# Note: travel() returns void, so we can't check if state exists
+					state_machine.travel("idle")
+					print("[HOUSE] ✅ Trash animation switched to idle after falling via state machine (travel: idle)")
+					# Also set AnimationPlayer to idle as backup
+					if animation_player:
+						animation_player.play("idle")
+						print("[HOUSE] ✅ Also set AnimationPlayer to idle as backup")
+				else:
+					# Fallback to AnimationPlayer if state machine not found
+					if animation_player:
+						animation_player.play("idle")
+						print("[HOUSE] ✅ Trash animation switched to idle after falling (via AnimationPlayer)")
+			elif animation_player:
+				animation_player.play("idle")
+				print("[HOUSE] ✅ Trash animation switched to idle after falling (via AnimationPlayer direct)")
+		
+		# Find MatchBox in scene (it might have been freed and recreated)
+		var active_matchbox = _get_matchbox_in_scene()
+		if active_matchbox:
+			active_matchbox.visible = true
+			active_matchbox.monitoring = true
+			match_box = active_matchbox  # Update reference
+			print("[HOUSE] ✅ MatchBox made visible and enabled after falling animation")
+		else:
+			print("[HOUSE] ⚠️ MatchBox not found in scene after falling animation")
 		# Disable detected area after animation completes
 		_disable_trash_detected_area()
 		# Disconnect signal to avoid multiple calls
@@ -954,6 +1027,83 @@ func _on_trash_falling_finished(anim_name: String) -> void:
 			if animation_player and animation_player.animation_finished.is_connected(_on_trash_falling_finished):
 				animation_player.animation_finished.disconnect(_on_trash_falling_finished)
 
+
+func _get_matchbox_in_scene() -> Area2D:
+	# First check if MatchBox is already in inventory - if so, don't show it
+	if _has_matchbox_in_inventory():
+		return null
+	
+	# First check if current match_box reference is valid
+	if match_box and is_instance_valid(match_box):
+		return match_box
+	
+	# Try to get from node path
+	var matchbox_node = get_node_or_null("MatchBox")
+	if matchbox_node and matchbox_node is Area2D:
+		return matchbox_node as Area2D
+	
+	# Search in children
+	for child in get_children():
+		if child is Area2D and child.name == "MatchBox":
+			return child
+	
+	# Try find_child as last resort
+	var found = find_child("MatchBox", true, false)
+	if found and found is Area2D:
+		return found as Area2D
+	
+	return null
+
+func _has_matchbox_in_inventory() -> bool:
+	# Check if MatchBox is in Global.inventory_data
+	for item in Global.inventory_data:
+		if item.has("name") and item["name"] == "MatchBox":
+			return true
+	return false
+
+func _restore_trash_falling_state() -> void:
+	# Restore trash to falling completed state and switch to idle animation
+	if trash_node:
+		var animation_tree = trash_node.get_node_or_null("AnimationTree")
+		var animation_player = trash_node.get_node_or_null("AnimationPlayer")
+		
+		# Try to switch to idle animation using state machine first
+		if animation_tree:
+			animation_tree.active = true
+			var state_machine = animation_tree.get("parameters/playback")
+			if state_machine:
+				# Try to travel to idle state
+				# Note: travel() returns void, so we can't check if state exists
+				state_machine.travel("idle")
+				print("[HOUSE] ✅ Trash animation switched to idle via state machine (travel: idle)")
+				# Also set AnimationPlayer to idle as backup
+				if animation_player:
+					animation_player.play("idle")
+					print("[HOUSE] ✅ Also set AnimationPlayer to idle as backup")
+			else:
+				# Fallback to AnimationPlayer if state machine not found
+				if animation_player:
+					animation_player.play("idle")
+					print("[HOUSE] ✅ Trash animation switched to idle (via AnimationPlayer)")
+		elif animation_player:
+			animation_player.play("idle")
+			print("[HOUSE] ✅ Trash animation switched to idle (via AnimationPlayer direct)")
+		
+		# Make MatchBox visible and enabled
+		var active_matchbox = _get_matchbox_in_scene()
+		if active_matchbox:
+			active_matchbox.visible = true
+			active_matchbox.monitoring = true
+			match_box = active_matchbox  # Update reference
+			print("[HOUSE] ✅ MatchBox restored to visible and enabled state")
+		else:
+			print("[HOUSE] ⚠️ MatchBox not found when restoring trash state")
+		
+		# Disable trash detected area
+		_disable_trash_detected_area()
+		print("[HOUSE] ✅ Trash falling state restored")
+	else:
+		print("[HOUSE] ❌ ERROR: trash_node is null when restoring state")
 
 func _disable_trash_detected_area() -> void:
 	if trash_detected_area:
@@ -1090,6 +1240,17 @@ func _close_dialog() -> void:
 
 
 func _load_blocks_scene() -> void:
+	# Check if princess_mouse is in inventory - if so, load final scene instead
+	if Global.current_inv_item == "princess_mouse" or Global.current_inv_item == "PrincessMouse":
+		var final_scene_path = "res://final/final.tscn"
+		print("[HOUSE] PrincessMouse in inventory - loading final scene instead of blocks")
+		if ResourceLoader.exists(final_scene_path):
+			get_tree().change_scene_to_file(final_scene_path)
+			print("[HOUSE] ✅ Scene changed to final successfully")
+		else:
+			print("[HOUSE] ❌ ERROR: Final scene file not found at path: ", final_scene_path)
+		return
+	
 	var blocks_scene_path = "res://room/blocks.tscn"
 	print("[HOUSE] Loading scene: ", blocks_scene_path)
 	
@@ -1381,11 +1542,77 @@ func _hide_throw_candy_label() -> void:
 
 
 func _has_candy_in_inventory() -> bool:
-	# Check if candy is in Global.inventory_data
+	# Check if candy is in Global.current_inv_item
+	return Global.current_inv_item == "candy" or Global.current_inv_item == "Candy"
+
+func _has_matchbox_and_threads_in_inventory() -> bool:
+	# Check if both MatchBox and Threads are in Global.inventory_data
+	var has_matchbox = false
+	var has_threads = false
+	
 	for item in Global.inventory_data:
-		if item.has("name") and item["name"] == "Candy":
-			return true
-	return false
+		if item.has("name"):
+			if item["name"] == "MatchBox":
+				has_matchbox = true
+			elif item["name"] == "Threads":
+				has_threads = true
+	
+	var result = has_matchbox and has_threads
+	
+	# Update predator texture when condition is met (only once)
+	if result and not predator_texture_updated:
+		_update_predator_texture()
+		predator_texture_updated = true
+	
+	return result
+
+func _update_predator_texture() -> void:
+	# Update Sprite2D texture in predator to котмыш.png when MatchBox and Threads are in inventory
+	if predator_node:
+		var sprite = predator_node.find_child("Sprite2D", true, false)
+		if sprite and sprite is Sprite2D:
+			var new_texture = load("res://predator/котмыш.png")
+			if new_texture:
+				sprite.texture = new_texture
+				print("[HOUSE] ✅ Predator Sprite2D texture updated to котмыш.png")
+			else:
+				print("[HOUSE] ⚠️ Could not load texture: res://predator/котмыш.png")
+		else:
+			print("[HOUSE] ⚠️ Sprite2D not found in predator_node")
+	else:
+		print("[HOUSE] ⚠️ predator_node is null")
+
+func _add_candy_to_inventory() -> void:
+	# Check if candy is already in inventory
+	# if _has_candy_in_inventory():
+	# 	print("[HOUSE] ⚠️ Candy is already in inventory")
+	# 	return
+	
+	if not candy_item_data:
+		print("[HOUSE] ❌ ERROR: candy_item_data is null")
+		return
+	
+	print("[HOUSE] ✅ Adding Candy to inventory from Global.current_inv_item...")
+	
+	# Add item to inventory
+	if house_gui and house_gui.has_method("add_item_to_inventory"):
+		if house_gui.add_item_to_inventory(candy_item_data):
+			# Add to Global.inventory_data
+			Global.inventory_data.append({
+				"name": candy_item_data.name,
+				"texture_path": candy_item_data.texture.resource_path if candy_item_data.texture else "",
+				"size": candy_item_data.size,
+				"description": candy_item_data.description
+			})
+			# Set current_inv_item to Candy
+			Global.current_inv_item = "Candy"
+			print("[HOUSE] ✅ Candy added to Global.inventory_data")
+			print("[HOUSE] ✅ Global.current_inv_item set to: ", Global.current_inv_item)
+			print("[HOUSE] 📦 Global.inventory_data contents: ", Global.inventory_data)
+		else:
+			print("[HOUSE] ❌ Inventory is full! Only one item allowed.")
+	else:
+		print("[HOUSE] ❌ ERROR: house_gui or add_item_to_inventory method not found!")
 
 
 func _create_trash_jump_label() -> void:
@@ -1433,7 +1660,10 @@ func _setup_all_matchboxes() -> void:
 	for child in get_children():
 		if child is Area2D and child.name == "MatchBox":
 			if not child.body_entered.is_connected(_on_matchbox_body_entered):
-				child.monitoring = true
+				# Hide MatchBox initially - it should only become visible after trash falling animation
+				child.visible = false
+				# Disable monitoring initially - will be enabled after falling animation
+				child.monitoring = false
 				child.monitorable = true
 				# Set collision mask to detect hero_mouse on layer 1
 				child.collision_mask = 1  # Layer 1
@@ -1441,7 +1671,7 @@ func _setup_all_matchboxes() -> void:
 				child.body_exited.connect(_on_matchbox_body_exited)
 				child.area_entered.connect(_on_matchbox_area_entered)
 				child.area_exited.connect(_on_matchbox_area_exited)
-				print("[HOUSE] MatchBox collision detection set up for: ", child.name)
+				print("[HOUSE] MatchBox collision detection set up for: ", child.name, " (initially hidden and disabled)")
 
 func _setup_all_candies() -> void:
 	# Set up collision detection for all candy instances in scene
@@ -1882,7 +2112,7 @@ func _on_candy_area_exited_with_source(area: Area2D, _candy_area: Area2D) -> voi
 			print("[HOUSE] ✅ Hero mouse area exited Candy")
 
 func _throw_candy() -> void:
-	if is_throwing_candy or not _has_candy_in_inventory():
+	if is_throwing_candy or not _has_candy_in_inventory() or not _has_matchbox_and_threads_in_inventory():
 		return
 	
 	is_throwing_candy = true
@@ -1994,6 +2224,15 @@ func _throw_candy() -> void:
 		predator_node.visible = false
 		print("[HOUSE] ✅ Predator hidden after candy throw")
 	
+	# Show Котекcидит in PredatorAwaking after candy is thrown
+	if predator_awaking:
+		var котекcидит = predator_awaking.find_child("Котекcидит", true, false)
+		if котекcидит:
+			котекcидит.visible = true
+			print("[HOUSE] ✅ Котекcидит made visible after candy throw")
+		else:
+			print("[HOUSE] ⚠️ Котекcидит not found in PredatorAwaking")
+	
 	# Remove CollisionShape2D2 from PredatorAwaking
 	if predator_awaking:
 		var collision_shape2 = null
@@ -2062,7 +2301,10 @@ func _pickup_candy() -> void:
 				"size": candy_item_data.size,
 				"description": candy_item_data.description
 			})
+			# Set current_inv_item to Candy
+			Global.current_inv_item = "Candy"
 			print("[HOUSE] ✅ Candy added to Global.inventory_data")
+			print("[HOUSE] ✅ Global.current_inv_item set to: ", Global.current_inv_item)
 			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
 			
 			# Remove Candy from scene
@@ -2206,7 +2448,10 @@ func _pickup_princess_mouse() -> void:
 				"size": princess_mouse_item_data.size,
 				"description": princess_mouse_item_data.description
 			})
+			# Set current_inv_item to PrincessMouse
+			Global.current_inv_item = "princess_mouse"
 			print("[HOUSE] ✅ PrincessMouse added to Global.inventory_data")
+			print("[HOUSE] ✅ Global.current_inv_item set to: ", Global.current_inv_item)
 			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
 			
 			# Remove PrincessMouse from scene

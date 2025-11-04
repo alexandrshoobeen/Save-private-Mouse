@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b5ivoskr6x0uv"]
 
-[ext_resource type="Script" uid="uid://b7bcnsisb2e1i" path="res://house/match_box.gd" id="1_6yiel"]
+[ext_resource type="Script" path="res://house/match_box.gd" id="1_6yiel"]
 [ext_resource type="Texture2D" uid="uid://l67ehr7bgtdv" path="res://house/спички.png" id="1_sobua"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6yiel"]

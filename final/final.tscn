@@ -1,0 +1,60 @@
+[gd_scene load_steps=7 format=3 uid="uid://dkhjd6fs5jltq"]
+
+[ext_resource type="Texture2D" uid="uid://dhhg3ogn1852u" path="res://house/передфмнал.png" id="1_7wgwd"]
+[ext_resource type="Script" uid="uid://b6wprk3uus0jr" path="res://final/final.gd" id="1_final"]
+[ext_resource type="Texture2D" uid="uid://72oyccietq7h" path="res://heroMouse/blackscreen.png" id="2_i3kkn"]
+
+[sub_resource type="Animation" id="Animation_hatow"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D2:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_4kgjt"]
+resource_name = "final_anim"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D2:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_n1463"]
+_data = {
+&"RESET": SubResource("Animation_hatow"),
+&"final_anim": SubResource("Animation_4kgjt")
+}
+
+[node name="Final" type="Node2D"]
+script = ExtResource("1_final")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("1_7wgwd")
+centered = false
+
+[node name="Sprite2D2" type="Sprite2D" parent="."]
+scale = Vector2(1.1383399, 1.2390057)
+texture = ExtResource("2_i3kkn")
+centered = false
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_n1463")
+}
