@@ -8,10 +8,11 @@ extends Node2D
 @onready var trash_node: Node2D = $Trash
 @onready var match_box: Area2D = $MatchBox
 @onready var threads_node: Node2D = $threads
+@onready var candy_node: Area2D = $candy
 var hero_mouse: CharacterBody2D = null
 var predator_awakened: bool = false
 var is_jumping_to_trash: bool = false
-var dialog_window: Control = null
+var dialog_window: CanvasLayer = null
 var house_gui: CanvasLayer = null
 var pickup_label: Label = null
 var pickup_label_layer: CanvasLayer = null
@@ -21,13 +22,56 @@ var current_matchbox: Area2D = null  # Currently active MatchBox for pickup
 var is_near_threads: bool = false
 var threads_item_data: ItemData = null
 var current_threads: Area2D = null  # Currently active threads pickup area
+var is_near_candy: bool = false
+var candy_item_data: ItemData = null
+var current_candy: Area2D = null  # Currently active candy for pickup
+var death_anim_start_time: float = 0.0
+var death_anim_animation_player: AnimationPlayer = null
+var death_anim_control_disabled: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Set up collisions (StaticBody2D) for physical obstacles
+	var collisions_node = find_child("collisions", true, false)
+	if collisions_node:
+		# If it's Area2D, we need to convert it or ensure it's StaticBody2D
+		# For now, let's set collision_layer = 2 for obstacles
+		if collisions_node is Area2D:
+			# Convert Area2D to StaticBody2D for physical collisions
+			var collision_shapes = []
+			for child in collisions_node.get_children():
+				if child is CollisionShape2D:
+					collision_shapes.append(child)
+			
+			# Create StaticBody2D
+			var static_body = StaticBody2D.new()
+			static_body.name = "collisions"
+			static_body.collision_layer = 2  # Layer 2 for obstacles
+			static_body.collision_mask = 0    # StaticBody doesn't need mask
+			
+			# Move collision shapes to StaticBody2D
+			for shape_node in collision_shapes:
+				collisions_node.remove_child(shape_node)
+				static_body.add_child(shape_node)
+			
+			# Replace Area2D with StaticBody2D
+			var parent = collisions_node.get_parent()
+			var index = collisions_node.get_index()
+			collisions_node.queue_free()
+			parent.add_child(static_body)
+			parent.move_child(static_body, index)
+			print("[HOUSE] ✅ Converted collisions Area2D to StaticBody2D for physical collisions")
+		elif collisions_node is StaticBody2D:
+			collisions_node.collision_layer = 2  # Layer 2 for obstacles
+			collisions_node.collision_mask = 0
+			print("[HOUSE] ✅ Set collisions StaticBody2D collision_layer = 2")
+	
 	# Ensure Area2D is monitoring
 	if predator_awaking:
 		predator_awaking.monitoring = true
 		predator_awaking.monitorable = false
+		# Set collision mask to detect hero_mouse on layer 1
+		predator_awaking.collision_mask = 1  # Layer 1
 		# Connect signals BEFORE adding hero_mouse
 		predator_awaking.body_entered.connect(_on_predator_awaking_body_entered)
 		predator_awaking.body_exited.connect(_on_predator_awaking_body_exited)
@@ -39,6 +83,8 @@ func _ready() -> void:
 	if get_up_area:
 		get_up_area.monitoring = true
 		get_up_area.monitorable = false
+		# Set collision mask to detect hero_mouse on layer 1
+		get_up_area.collision_mask = 1  # Layer 1
 		get_up_area.body_entered.connect(_on_get_up_area_body_entered)
 		get_up_area.body_exited.connect(_on_get_up_area_body_exited)
 		print("[HOUSE] Get up area set up and monitoring: ", get_up_area.monitoring)
@@ -53,6 +99,8 @@ func _ready() -> void:
 	if jump_area:
 		jump_area.monitoring = true
 		jump_area.monitorable = false
+		# Set collision mask to detect hero_mouse on layer 1
+		jump_area.collision_mask = 1  # Layer 1
 		jump_area.body_entered.connect(_on_jump_area_body_entered)
 		print("[HOUSE] Jump area set up and monitoring: ", jump_area.monitoring)
 	else:
@@ -62,6 +110,8 @@ func _ready() -> void:
 	if entering_room:
 		entering_room.monitoring = true
 		entering_room.monitorable = false
+		# Set collision mask to detect hero_mouse on layer 1
+		entering_room.collision_mask = 1  # Layer 1
 		entering_room.body_entered.connect(_on_entering_room_body_entered)
 		print("[HOUSE] Entering room area set up and monitoring: ", entering_room.monitoring)
 	else:
@@ -70,8 +120,15 @@ func _ready() -> void:
 	# Create and add hero_mouse
 	var hero_mouse_scene = preload("res://heroMouse/hero_mouse.tscn")
 	hero_mouse = hero_mouse_scene.instantiate()
-	hero_mouse.position = Vector2(550.0, 620.0)
+	hero_mouse.position = Vector2(550.0, 560.0)
 	hero_mouse.z_index = 2  # Ensure hero_mouse is above threads (1) and tumba (0)
+	
+	# Set collision layer for hero_mouse (layer 1 = bit 0)
+	# This allows Area2D to detect it
+	hero_mouse.collision_layer = 1  # Layer 1
+	# Set collision_mask to collide with obstacles (layer 2) and for Area2D detection (layer 1)
+	hero_mouse.collision_mask = 1 | 2  # Can collide with layer 1 (Area2D) and layer 2 (StaticBody2D obstacles)
+	
 	add_child(hero_mouse)
 	print("Hero mouse created: ", hero_mouse.name)
 	
@@ -79,6 +136,8 @@ func _ready() -> void:
 	if match_box:
 		match_box.monitoring = true
 		match_box.monitorable = true
+		# Set collision mask to detect hero_mouse on layer 1
+		match_box.collision_mask = 1  # Layer 1
 		match_box.body_entered.connect(_on_matchbox_body_entered)
 		match_box.body_exited.connect(_on_matchbox_body_exited)
 		match_box.area_entered.connect(_on_matchbox_area_entered)
@@ -88,12 +147,17 @@ func _ready() -> void:
 	# Also set up for any existing MatchBox in scene
 	_setup_all_matchboxes()
 	
+	# Also set up for any existing candy in scene
+	_setup_all_candies()
+	
 	# Set up threads collision detection
 	if threads_node:
 		var threads_pickup_area = threads_node.find_child("PickupArea", true, false)
 		if threads_pickup_area and threads_pickup_area is Area2D:
 			threads_pickup_area.monitoring = true
 			threads_pickup_area.monitorable = true
+			# Set collision mask to detect hero_mouse on layer 1
+			threads_pickup_area.collision_mask = 1  # Layer 1
 			threads_pickup_area.body_entered.connect(_on_threads_body_entered)
 			threads_pickup_area.body_exited.connect(_on_threads_body_exited)
 			threads_pickup_area.area_entered.connect(_on_threads_area_entered)
@@ -113,6 +177,16 @@ func _ready() -> void:
 	threads_item_data.height = 226
 	threads_item_data.size = Vector2i(1, 1)
 	
+	# Create candy item data programmatically (not using .tres file from room)
+	candy_item_data = ItemData.new()
+	candy_item_data.type = ItemData.Type.MAIN
+	candy_item_data.name = "Candy"
+	candy_item_data.description = "This is candy"
+	candy_item_data.texture = load("res://house/конфеточька.png")
+	candy_item_data.width = 320
+	candy_item_data.height = 250
+	candy_item_data.size = Vector2i(1, 1)
+	
 	# Create house GUI
 	house_gui = CanvasLayer.new()
 	house_gui.set_script(load("res://house/house_gui.gd"))
@@ -131,6 +205,8 @@ func _input(event: InputEvent) -> void:
 			_pickup_matchbox()
 		elif is_near_threads:
 			_pickup_threads()
+		elif is_near_candy:
+			_pickup_candy()
 
 func _process(_delta: float) -> void:
 	# Update pickup label position (convert world to screen coordinates)
@@ -139,6 +215,8 @@ func _process(_delta: float) -> void:
 		target_item = current_matchbox
 	elif is_near_threads and current_threads:
 		target_item = current_threads
+	elif is_near_candy and current_candy:
+		target_item = current_candy
 	
 	if target_item and pickup_label:
 		var world_pos = target_item.global_position
@@ -181,7 +259,6 @@ func _process(_delta: float) -> void:
 					)
 					if zone_rect.has_point(mouse_pos):
 						is_in_zone = true
-						print("Manual check: hero_mouse at ", mouse_pos, " is in rectangle zone at ", zone_rect)
 						break
 				elif shape is CircleShape2D:
 					var circle_shape = shape as CircleShape2D
@@ -189,7 +266,6 @@ func _process(_delta: float) -> void:
 					var distance = mouse_pos.distance_to(zone_pos)
 					if distance <= radius:
 						is_in_zone = true
-						print("Manual check: hero_mouse at ", mouse_pos, " is in circle zone at ", zone_pos, " radius ", radius)
 						break
 				elif shape is CapsuleShape2D:
 					var capsule_shape = shape as CapsuleShape2D
@@ -198,7 +274,6 @@ func _process(_delta: float) -> void:
 					var distance = mouse_pos.distance_to(zone_pos)
 					if distance <= radius + capsule_shape.height / 2:
 						is_in_zone = true
-						print("Manual check: hero_mouse at ", mouse_pos, " is in capsule zone at ", zone_pos)
 						break
 		
 		# Update predator state based on zone presence
@@ -209,75 +284,41 @@ func _process(_delta: float) -> void:
 			# Start death animation for Camera2D
 			_start_camera_death_anim()
 		elif not is_in_zone and predator_awakened:
-			print("Manual check: hero_mouse left zone")
 			if predator_node and predator_node.has_method("fall_asleep"):
 				predator_node.fall_asleep()
 				predator_awakened = false
 			# Stop death animation for Camera2D
 			_stop_camera_death_anim()
 	
-	# Manual check for "get up" area (backup check)
-	if hero_mouse and get_up_area:
-		var zone_shape_node = get_up_area.get_node("CollisionShape2D")
-		if zone_shape_node and zone_shape_node.shape is RectangleShape2D:
-			var rect_shape = zone_shape_node.shape as RectangleShape2D
-			var zone_transform = zone_shape_node.global_transform
-			var zone_pos = zone_transform.origin
-			var zone_size = rect_shape.size
-			
-			var zone_rect = Rect2(
-				zone_pos.x - zone_size.x / 2,
-				zone_pos.y - zone_size.y / 2,
-				zone_size.x,
-				zone_size.y
-			)
-			
-			var mouse_pos = hero_mouse.global_position
-			var is_in_get_up_zone = zone_rect.has_point(mouse_pos)
-			var current_vertical_state = false
-			if "can_move_vertically" in hero_mouse:
-				current_vertical_state = hero_mouse.can_move_vertically
-			
-			if is_in_get_up_zone and not current_vertical_state:
-				print("[HOUSE] 🔵 MANUAL CHECK: hero_mouse at ", mouse_pos, " is in get_up zone!")
-				print("[HOUSE] Current can_move_vertically: ", current_vertical_state)
-				if hero_mouse.has_method("enable_vertical_movement"):
-					hero_mouse.enable_vertical_movement()
-			elif not is_in_get_up_zone and current_vertical_state == true:
-				print("[HOUSE] 🔴 MANUAL CHECK: hero_mouse left get_up zone!")
-				if hero_mouse.has_method("disable_vertical_movement"):
-					hero_mouse.disable_vertical_movement()
+	# Manual check for "get up" areas is disabled
+	# We rely on signals (body_entered/exited) for state changes
+	# This is more efficient and avoids constant state checks every frame
+	# Signals will handle state changes automatically when hero_mouse enters/exits zones
 
 
 func _on_predator_awaking_body_entered(body: Node) -> void:
-	print("Body entered PredatorAwaking zone: ", body.name, " | Path: ", body.get_path())
 	# Check if the entering body is the hero_mouse (CharacterBody2D will trigger this)
 	if not predator_awakened:
 		if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
-			print("Hero mouse detected in zone, waking up predator")
 			if predator_node:
 				if predator_node.has_method("wake_up"):
 					predator_node.wake_up()
 					predator_awakened = true
-					print("Predator awakened successfully!")
 				else:
-					print("ERROR: predator_node doesn't have wake_up method")
+					print("[HOUSE] ERROR: predator_node doesn't have wake_up method")
 			else:
-				print("ERROR: predator_node is null")
+				print("[HOUSE] ERROR: predator_node is null")
 			
 			# Start death animation for Camera2D
 			_start_camera_death_anim()
 
 
 func _on_predator_awaking_body_exited(body: Node) -> void:
-	print("Body exited PredatorAwaking zone: ", body.name, " | Path: ", body.get_path())
 	# Check if the exiting body is the hero_mouse
 	if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
-		print("Hero mouse left zone, putting predator to sleep")
 		if predator_node and predator_node.has_method("fall_asleep"):
 			predator_node.fall_asleep()
 			predator_awakened = false
-			print("Predator fell asleep")
 		
 		# Stop death animation for Camera2D
 		_stop_camera_death_anim()
@@ -379,7 +420,7 @@ func _on_jump_animation_complete(mouse: CharacterBody2D) -> void:
 	print("[HOUSE] Jump animation completed!")
 	
 	# Hide hero_mouse
-	mouse.visible = false
+	#mouse.visible = false
 	print("[HOUSE] Hero mouse hidden")
 	
 	# Start falling animation for trash
@@ -435,17 +476,22 @@ func _show_enter_dialog() -> void:
 			hero_mouse.set_idle_left()
 			print("[HOUSE] Hero mouse animation set to idle_left")
 	
+	# Create CanvasLayer for dialog to ensure it's on top of all layers
+	dialog_window = CanvasLayer.new()
+	dialog_window.name = "EnterDialogLayer"
+	dialog_window.layer = 100  # High layer value to ensure it's above everything
+	
 	# Create main dialog container
-	dialog_window = Control.new()
-	dialog_window.name = "EnterDialog"
-	dialog_window.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dialog_window.mouse_filter = Control.MOUSE_FILTER_STOP
+	var dialog_container = Control.new()
+	dialog_container.name = "EnterDialog"
+	dialog_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dialog_container.mouse_filter = Control.MOUSE_FILTER_STOP
 	
 	# Create semi-transparent background
 	var background = ColorRect.new()
 	background.color = Color(0, 0, 0, 0.5)
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dialog_window.add_child(background)
+	dialog_container.add_child(background)
 	
 	# Create dialog panel
 	var panel = Panel.new()
@@ -453,7 +499,7 @@ func _show_enter_dialog() -> void:
 	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.custom_minimum_size = Vector2(400, 200)
 	panel.position = Vector2(-200, -100)
-	dialog_window.add_child(panel)
+	dialog_container.add_child(panel)
 	
 	# Create VBoxContainer for layout
 	var vbox = VBoxContainer.new()
@@ -501,7 +547,8 @@ func _show_enter_dialog() -> void:
 	no_button.pressed.connect(_on_dialog_no)
 	buttons_container.add_child(no_button)
 	
-	# Add dialog to scene tree
+	# Add dialog container to CanvasLayer and add layer to scene tree
+	dialog_window.add_child(dialog_container)
 	get_tree().root.add_child(dialog_window)
 	print("[HOUSE] ✅ Dialog window created")
 
@@ -520,6 +567,7 @@ func _on_dialog_no() -> void:
 
 func _close_dialog() -> void:
 	if dialog_window:
+		# dialog_window is now a CanvasLayer, so we can queue_free it directly
 		dialog_window.queue_free()
 		dialog_window = null
 		print("[HOUSE] Dialog window closed")
@@ -691,25 +739,42 @@ func _setup_all_matchboxes() -> void:
 			if not child.body_entered.is_connected(_on_matchbox_body_entered):
 				child.monitoring = true
 				child.monitorable = true
+				# Set collision mask to detect hero_mouse on layer 1
+				child.collision_mask = 1  # Layer 1
 				child.body_entered.connect(_on_matchbox_body_entered)
 				child.body_exited.connect(_on_matchbox_body_exited)
 				child.area_entered.connect(_on_matchbox_area_entered)
 				child.area_exited.connect(_on_matchbox_area_exited)
 				print("[HOUSE] MatchBox collision detection set up for: ", child.name)
 
+func _setup_all_candies() -> void:
+	# Set up collision detection for all candy instances in scene
+	for child in get_children():
+		if child is Area2D and child.name == "candy":
+			if not child.body_entered.is_connected(_on_candy_body_entered):
+				child.monitoring = true
+				child.monitorable = true
+				# Set collision mask to detect hero_mouse on layer 1
+				child.collision_mask = 1  # Layer 1
+				child.body_entered.connect(_on_candy_body_entered)
+				child.body_exited.connect(_on_candy_body_exited)
+				child.area_entered.connect(_on_candy_area_entered)
+				child.area_exited.connect(_on_candy_area_exited)
+				print("[HOUSE] Candy collision detection set up for: ", child.name)
+
 func _show_pickup_label() -> void:
 	if pickup_label:
 		pickup_label.visible = true
 		# Position will be updated in _process
 		# Show label if near any item
-		if is_near_matchbox or is_near_threads:
+		if is_near_matchbox or is_near_threads or is_near_candy:
 			pickup_label.visible = true
 
 
 func _hide_pickup_label() -> void:
 	if pickup_label:
 		# Hide label only if not near any item
-		if not is_near_matchbox and not is_near_threads:
+		if not is_near_matchbox and not is_near_threads and not is_near_candy:
 			pickup_label.visible = false
 
 # Threads pickup functions
@@ -843,10 +908,34 @@ func _start_camera_death_anim() -> void:
 		if camera:
 			var animation_player = camera.find_child("AnimationPlayer", true, false)
 			if animation_player and animation_player.has_animation("death_anim"):
+				# Store animation player and start time
+				death_anim_animation_player = animation_player
+				death_anim_start_time = Time.get_ticks_msec() / 1000.0
+				death_anim_control_disabled = false
+				
+				# Connect to animation finished signal
+				if not animation_player.animation_finished.is_connected(_on_death_anim_finished):
+					animation_player.animation_finished.connect(_on_death_anim_finished)
+				
+				# Start animation
 				animation_player.play("death_anim")
 				print("[HOUSE] ✅ Camera2D death animation started")
+				
+				# Start timer to disable control after 4.5 seconds
+				_check_death_anim_duration()
 			else:
 				print("[HOUSE] ❌ Camera2D AnimationPlayer or death_anim not found")
+
+func _check_death_anim_duration() -> void:
+	# Wait 4.5 seconds
+	await get_tree().create_timer(4.5).timeout
+	# Check if animation is still playing
+	if death_anim_animation_player and death_anim_animation_player.is_playing() and death_anim_animation_player.current_animation == "death_anim":
+		# Animation is still playing after 4.5 seconds, disable control
+		if hero_mouse and hero_mouse.has_method("disable_control"):
+			hero_mouse.disable_control()
+			death_anim_control_disabled = true
+			print("[HOUSE] ⚠️ Death animation playing for 4.5+ seconds - control disabled")
 
 func _stop_camera_death_anim() -> void:
 	if hero_mouse:
@@ -854,6 +943,10 @@ func _stop_camera_death_anim() -> void:
 		if camera:
 			var animation_player = camera.find_child("AnimationPlayer", true, false)
 			if animation_player:
+				# Disconnect from animation finished signal if connected
+				if animation_player.animation_finished.is_connected(_on_death_anim_finished):
+					animation_player.animation_finished.disconnect(_on_death_anim_finished)
+				
 				if animation_player.has_animation("RESET"):
 					animation_player.play("RESET")
 				else:
@@ -861,6 +954,22 @@ func _stop_camera_death_anim() -> void:
 				print("[HOUSE] ✅ Camera2D death animation stopped")
 			else:
 				print("[HOUSE] ❌ Camera2D AnimationPlayer not found")
+	
+	# Reset death animation tracking
+	death_anim_animation_player = null
+	death_anim_start_time = 0.0
+	death_anim_control_disabled = false
+
+func _on_death_anim_finished(anim_name: String) -> void:
+	if anim_name == "death_anim":
+		print("[HOUSE] ✅ Death animation finished - loading game over scene")
+		# Load game over scene
+		var game_over_scene_path = "res://game_over/game_over.tscn"
+		if ResourceLoader.exists(game_over_scene_path):
+			get_tree().change_scene_to_file(game_over_scene_path)
+			print("[HOUSE] ✅ Game over scene loaded")
+		else:
+			print("[HOUSE] ❌ ERROR: Game over scene not found at: ", game_over_scene_path)
 
 
 func _pickup_matchbox() -> void:
@@ -934,5 +1043,143 @@ func _pickup_threads() -> void:
 			print("[HOUSE] ✅ Threads picked up and added to inventory!")
 		else:
 			print("[HOUSE] ❌ Inventory is full! Only one item allowed.")
+	else:
+		print("[HOUSE] ❌ ERROR: house_gui or add_item_to_inventory method not found!")
+
+# Candy pickup functions
+func _on_candy_body_entered(body: Node) -> void:
+	# Try to find the candy that triggered this
+	var candy_area = null
+	for child in get_children():
+		if child is Area2D and child.name == "candy":
+			if child.get_overlapping_bodies().has(body):
+				candy_area = child
+				break
+	
+	if not candy_area:
+		candy_area = find_child("candy", true, false) as Area2D
+	
+	_on_candy_body_entered_with_source(body, candy_area)
+
+func _on_candy_body_entered_with_source(body: Node, candy_area: Area2D) -> void:
+	print("[HOUSE] Body entered Candy area: ", body.name)
+	if candy_area and (body.name == "HeroMouse" or "HeroMouse" in str(body.get_path())):
+		current_candy = candy_area
+		is_near_candy = true
+		_show_pickup_label()
+		print("[HOUSE] ✅ Hero mouse near Candy - showing pickup label")
+
+
+func _on_candy_body_exited(body: Node) -> void:
+	# Try to find the candy that triggered this
+	var candy_area = null
+	for child in get_children():
+		if child is Area2D and child.name == "candy":
+			if not child.get_overlapping_bodies().has(body):
+				# Check if this was the one we were near
+				if child == current_candy:
+					candy_area = child
+					break
+	
+	_on_candy_body_exited_with_source(body, candy_area)
+
+func _on_candy_body_exited_with_source(body: Node, _candy_area: Area2D) -> void:
+	print("[HOUSE] Body exited Candy area: ", body.name)
+	if body.name == "HeroMouse" or "HeroMouse" in str(body.get_path()):
+		# Check if we're still near any candy
+		var still_near = false
+		for child in get_children():
+			if child is Area2D and child.name == "candy":
+				if child.get_overlapping_bodies().has(body):
+					current_candy = child
+					still_near = true
+					break
+		
+		if not still_near:
+			is_near_candy = false
+			current_candy = null
+			_hide_pickup_label()
+			print("[HOUSE] ✅ Hero mouse left Candy area")
+
+
+func _on_candy_area_entered(area: Area2D) -> void:
+	if "HeroMouse" in area.get_path().get_concatenated_names():
+		# Find which candy triggered this signal
+		var candy_area = null
+		for child in get_children():
+			if child is Area2D and child.name == "candy":
+				if child.get_overlapping_areas().has(area):
+					candy_area = child
+					break
+		
+		_on_candy_area_entered_with_source(area, candy_area)
+
+func _on_candy_area_entered_with_source(area: Area2D, candy_area: Area2D) -> void:
+	if candy_area and "HeroMouse" in area.get_path().get_concatenated_names():
+		current_candy = candy_area
+		is_near_candy = true
+		_show_pickup_label()
+		print("[HOUSE] ✅ Hero mouse area entered Candy - showing pickup label")
+
+
+func _on_candy_area_exited(area: Area2D) -> void:
+	if "HeroMouse" in area.get_path().get_concatenated_names():
+		# Find which candy triggered this signal
+		var candy_area = null
+		for child in get_children():
+			if child is Area2D and child.name == "candy":
+				if not child.get_overlapping_areas().has(area):
+					if child == current_candy:
+						candy_area = child
+						break
+		
+		_on_candy_area_exited_with_source(area, candy_area)
+
+func _on_candy_area_exited_with_source(area: Area2D, _candy_area: Area2D) -> void:
+	if "HeroMouse" in area.get_path().get_concatenated_names():
+		# Check if we're still near any candy
+		var still_near = false
+		for child in get_children():
+			if child is Area2D and child.name == "candy":
+				if child.get_overlapping_areas().has(area):
+					current_candy = child
+					still_near = true
+					break
+		
+		if not still_near:
+			is_near_candy = false
+			current_candy = null
+			_hide_pickup_label()
+			print("[HOUSE] ✅ Hero mouse area exited Candy")
+
+func _pickup_candy() -> void:
+	if not is_near_candy or not current_candy or not candy_item_data:
+		return
+	
+	print("[HOUSE] ✅ Picking up Candy...")
+	
+	# Add item to inventory
+	if house_gui and house_gui.has_method("add_item_to_inventory"):
+		if house_gui.add_item_to_inventory(candy_item_data):
+			# Add to Global.inventory_data
+			Global.inventory_data.append({
+				"name": candy_item_data.name,
+				"texture_path": candy_item_data.texture.resource_path if candy_item_data.texture else "",
+				"size": candy_item_data.size,
+				"description": candy_item_data.description
+			})
+			print("[HOUSE] ✅ Candy added to Global.inventory_data")
+			print("[HOUSE] 📦 Global.inventory_data contents after pickup: ", Global.inventory_data)
+			
+			# Remove Candy from scene
+			var candy_to_remove = current_candy
+			current_candy = null
+			candy_to_remove.queue_free()
+			is_near_candy = false
+			_hide_pickup_label()
+			print("[HOUSE] ✅ Candy picked up and added to inventory!")
+		else:
+			print("[HOUSE] ❌ Inventory is full! Only one item allowed.")
+			# Можно показать сообщение игроку, что инвентарь полон
 	else:
 		print("[HOUSE] ❌ ERROR: house_gui or add_item_to_inventory method not found!")

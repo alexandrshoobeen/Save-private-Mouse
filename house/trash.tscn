@@ -49,7 +49,7 @@ states/falling/position = Vector2(428, 111)
 [node name="Trash" type="Node2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(-182, -437)
+position = Vector2(-176, -556.00006)
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("1_30m5c")
 centered = false
